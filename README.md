@@ -1,4 +1,4 @@
-# ESE File Viewer Application
+# Sweatbix File Creater Application
 
 A Python tkinter-based GUI application for viewing and analyzing .ese (EuroScope Sector File) files.
 
