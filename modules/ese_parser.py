@@ -3,7 +3,6 @@ ESE Parser Module
 Parses EuroScope Sector Files (.ese)
 """
 import re
-from typing import Dict, List, Tuple, Optional
 
 class ESEParser:
     def __init__(self, ese_filepath):

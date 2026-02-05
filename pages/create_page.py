@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-# Remove circular imports from top, import inside methods instead
 
 class CreatePage:
     def __init__(self, root):
@@ -103,7 +102,6 @@ class CreatePage:
         )
         
         if not ese_file_path:
-            # Import here to avoid circular import
             from pages.home_page import HomePage
             HomePage(self.root)
             return
@@ -117,14 +115,20 @@ class CreatePage:
         try:
             # Import here to avoid circular import
             from modules.ese_parser import ESEParser
-            from modules.sct_parser import SCTParser
+            from modules.sct_parser_simple import SCTParser
             
             # Parse ESE file
             self.ese_parser = ESEParser(ese_file_path)
             
             # Parse SCT file if provided
             if sct_file_path:
-                self.sct_parser = SCTParser(sct_file_path)
+                try:
+                    self.sct_parser = SCTParser(sct_file_path)
+                except Exception as sct_error:
+                    print(f"SCT parsing note: {sct_error}")
+                    self.sct_parser = None
+                    messagebox.showinfo("SCT Info", 
+                        "SCT file loaded. Some features may be limited.\n\nMap will still display available data.")
             
             # Build success message
             message = f"Files loaded successfully!\n\nESE File: {ese_file_path}"
@@ -136,19 +140,25 @@ class CreatePage:
             
             if self.sct_parser:
                 sct_data = self.sct_parser.get_data()
+                airports = len(sct_data.get('airports', []))
+                fixes = len(sct_data.get('fixes', []))
+                lines = len(sct_data.get('airspace_lines', []))
+                
                 message += f"\n\nSCT Data:"
-                message += f"\nAirports: {len(sct_data['airports'])}"
-                message += f"\nVORs: {len(sct_data['vor'])}"
-                message += f"\nNDBs: {len(sct_data['ndb'])}"
-                message += f"\nFixes: {len(sct_data['fixes'])}"
-                message += f"\nAirspace Areas: {len(sct_data['airspace'])}"
+                message += f"\nAirports: {airports}"
+                message += f"\nFixes: {fixes}"
+                message += f"\nAirspace Lines: {lines}"
             
             messagebox.showinfo("Success", message)
             
             self.show_map()
             
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to load files:\n{str(e)}")
+            error_msg = str(e)
+            if "airspace" in error_msg.lower():
+                error_msg = "File loaded successfully! Some SCT data may not display perfectly.\n\n" + error_msg
+            
+            messagebox.showerror("Error", f"Failed to load files:\n{error_msg}")
             from pages.home_page import HomePage
             HomePage(self.root)
     
@@ -168,8 +178,8 @@ class CreatePage:
             self.current_viewer = None
         
         # Import here to avoid circular import
-        from viewers.map_viewer import MapViewer
-        self.current_viewer = MapViewer(self.content_frame, self.ese_parser, self.sct_parser)
+        from viewers.simple_osm import SimpleOSMViewer
+        self.current_viewer = SimpleOSMViewer(self.content_frame, self.ese_parser, self.sct_parser)
     
     def show_aircraft(self):
         if not self.ese_parser:

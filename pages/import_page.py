@@ -60,39 +60,9 @@ class ImportPage:
             command=self.go_back
         )
         back_button.pack(pady=30)
-        
-        # Placeholder for future features
-        placeholder_frame = tk.Frame(main_container, bg='#f8f9fa', relief='solid', borderwidth=1)
-        placeholder_frame.pack(pady=20, padx=40, fill='x')
-        
-        tk.Label(
-            placeholder_frame,
-            text="Planned Import Features:",
-            font=('Arial', 11, 'bold'),
-            bg='#f8f9fa'
-        ).pack(pady=(10, 5))
-        
-        features = [
-            "• Import multiple file formats (SCT, ESE, OpenAir, etc.)",
-            "• Batch processing of sector files",
-            "• Data conversion between formats",
-            "• Merge multiple sector files",
-            "• Import real-time data feeds"
-        ]
-        
-        for feature in features:
-            tk.Label(
-                placeholder_frame,
-                text=feature,
-                font=('Arial', 10),
-                bg='#f8f9fa',
-                anchor='w',
-                justify='left'
-            ).pack(fill='x', padx=20, pady=2)
     
     def go_back(self):
         """Return to home page"""
-        # Import here to avoid circular import
         from pages.home_page import HomePage
         self.frame.destroy()
         HomePage(self.root)

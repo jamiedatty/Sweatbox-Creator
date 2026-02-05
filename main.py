@@ -3,11 +3,10 @@ from pages.home_page import HomePage
 
 def main():
     root = tk.Tk()
-    root.title("ESE File Viewer")
+    root.title("ESE/SCT File Viewer")
     root.geometry("1200x800")
     root.minsize(1000, 700)
     
-    # Set application icon
     try:
         root.iconbitmap('icon.ico')
     except:
