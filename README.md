@@ -1,87 +1,40 @@
-# Sweatbix File Creater Application
+Sweatbox File Viewer/Creator
 
-A Python tkinter-based GUI application for viewing and analyzing .ese (EuroScope Sector File) files.
+A Python tkinter-based GUI application for viewing and analyzing EuroScope Sector Files (.ese) and Sector Files (.sct).
 
 ## Features
 
-### Home Page
-- **Create**: Load and analyze an ESE file
-- **Import**: Future feature (currently shows "Not available yet" message)
+### File Loading
+- Load ESE (EuroScope Sector) files
+- Load SCT (Sector) files for additional data
+- Optional SCT file loading for airspace information
 
-### Create Page Features
-After loading an ESE file, you can access:
-
-1. **Map View**: 
-   - Visual representation of controller positions
-   - Color-coded by position type (Tower/Ground, Approach, Center, ATIS)
-   - Interactive tooltips showing position details
-   - Coordinate grid overlay
+### Views
+1. **Map View** (Interactive):
+   - Real map display using OpenStreetMap
+   - Controller positions with color coding
+   - Airports, VORs, NDBs, and fixes
+   - Airspace classes (A-G) with adjustable transparency
+   - Airways (high and low)
+   - Interactive tooltips and popups
+   - Zoom and pan functionality
+   - Multiple base map layers
 
 2. **Aircraft View**:
-   - Displays SIDs/STARs grouped by airport
-   - Shows procedure counts and names
-   - Future: Will include flight plan management
+   - SIDs/STARs display grouped by airport
+   - Procedure counts and names
+   - Placeholder for future aircraft management features
 
 3. **Controllers View**:
-   - Searchable table of all controller positions
-   - Filter by position type (TWR, GND, APP, CTR, ATIS, DEL)
-   - Statistics summary
+   - Filterable table of controller positions
+   - Search by callsign, name, frequency, or type
+   - Color-coded by position type
+   - Export to CSV functionality
+   - Double-click for detailed view
 
-4. **Master Pseudo-controller Entry**:
-   - Text field for entering master pseudo-controller information
+## Installation
 
-## File Structure
-
-```
-main.py                 - Application entry point
-home_page.py           - Home page with Create/Import buttons
-create_page.py         - Main viewing page with navigation
-ese_parser.py          - ESE file parser
-map_viewer.py          - Map visualization component
-aircraft_viewer.py     - Aircraft/SIDs/STARs viewer
-controller_viewer.py   - Controller positions table viewer
-```
-
-## Installation & Running
-
-### Requirements
-- Python 3.x
-- tkinter (usually comes with Python)
-
-### Run the Application
+1. Install Python 3.7 or higher
+2. Install required packages:
 ```bash
-python main.py
-```
-
-## Usage
-
-1. Launch the application
-2. Click "Create" on the home page
-3. Select an ESE file when prompted
-4. Navigate between Map, Aircraft, and Controllers views using the top menu buttons
-5. Use filters and interact with the data as needed
-
-## ESE File Format
-
-The application parses standard EuroScope Sector Files (.ese) which contain:
-- `[POSITIONS]` - Controller positions with frequencies and coordinates
-- `[SIDSSTARS]` - Standard Instrument Departures and Arrivals
-- `[AIRSPACE]` - Airspace definitions
-- `[RADAR]` - Radar coverage areas
-- `[FREETEXT]` - Additional text annotations
-
-## Color Coding (Map View)
-
-- **Red**: Tower/Ground/Delivery positions
-- **Orange**: Approach/Departure positions
-- **Blue**: Center positions
-- **Grey**: ATIS and other positions
-
-## Future Enhancements
-
-- Full panning and zooming on the map
-- Import functionality
-- Export capabilities
-- More detailed aircraft information
-- Route visualization
-- Real-time position tracking
+pip install -r requirements.txt

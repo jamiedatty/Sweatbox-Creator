@@ -1,6 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
-from create_page import CreatePage
 
 class HomePage:
     def __init__(self, root):
@@ -49,28 +47,13 @@ class HomePage:
         import_btn.pack(pady=10)
     
     def open_create_page(self):
+        # Import here to avoid circular import
+        from pages.create_page import CreatePage
         self.frame.destroy()
         CreatePage(self.root)
     
     def open_import_page(self):
-        import_window = tk.Toplevel(self.root)
-        import_window.title("Import")
-        import_window.geometry("300x150")
-        import_window.resizable(False, False)
-        
-        message_label = tk.Label(
-            import_window,
-            text="Not available yet",
-            font=('Arial', 14),
-            pady=40
-        )
-        message_label.pack()
-        
-        ok_btn = tk.Button(
-            import_window,
-            text="OK",
-            font=('Arial', 12),
-            width=10,
-            command=import_window.destroy
-        )
-        ok_btn.pack(pady=10)
+        # Import here to avoid circular import
+        from pages.import_page import ImportPage
+        self.frame.destroy()
+        ImportPage(self.root)

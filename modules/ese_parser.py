@@ -1,19 +1,24 @@
+"""
+ESE Parser Module
+Parses EuroScope Sector Files (.ese)
+"""
 import re
+from typing import Dict, List, Tuple, Optional
 
 class ESEParser:
-    def __init__(self, filepath):
-        self.filepath = filepath
+    def __init__(self, ese_filepath):
+        self.ese_filepath = ese_filepath
         self.data = {
             'positions': [],
             'sidsstars': [],
             'airspace': [],
             'radar': [],
-            'freetext': []
+            'freetext': [],
         }
         self.parse()
     
     def parse(self):
-        with open(self.filepath, 'r', encoding='latin-1') as f:
+        with open(self.ese_filepath, 'r', encoding='latin-1') as f:
             content = f.read()
         
         sections = self._split_sections(content)
@@ -158,7 +163,8 @@ class ESEParser:
                     coordinates.append({
                         'lat': lat,
                         'lon': lon,
-                        'name': position['callsign']
+                        'name': position['callsign'],
+                        'type': 'POSITION'
                     })
         return coordinates
     

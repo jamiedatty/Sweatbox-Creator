@@ -1,7 +1,3 @@
-"""
-Aircraft Viewer Module
-Displays aircraft-related information (placeholder for future functionality)
-"""
 import tkinter as tk
 from tkinter import ttk
 
@@ -21,7 +17,7 @@ class AircraftViewer:
             text="Aircraft Information",
             font=('Arial', 18, 'bold'),
             bg='white',
-            fg='white'
+            fg='black'  # Fixed: Added color value
         )
         title_label.pack(pady=20)
         
@@ -29,9 +25,10 @@ class AircraftViewer:
             main_frame,
             font=('Arial', 11),
             wrap='word',
-            bg='white',
+            bg='#f0f0f0',  # Fixed: Added color value
             relief='flat',
-            height=20)
+            height=20
+        )
         info_text.pack(fill='both', expand=True, pady=10)
         
         scrollbar = ttk.Scrollbar(info_text, command=info_text.yview)
@@ -80,6 +77,6 @@ class AircraftViewer:
         else:
             info_text.insert('end', "No SID/STAR data found in ESE file\n")
         
-        info_text.tag_config('airport', font=('Arial', 11, 'bold'), foreground='white')
+        info_text.tag_config('airport', font=('Arial', 11, 'bold'), foreground='darkblue')  # Fixed: Added color value
         
         info_text.config(state='disabled')

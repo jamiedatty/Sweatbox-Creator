@@ -1,0 +1,3 @@
+folium>=0.14.0
+tkinterweb>=3.0.0
+Pillow>=10.0.0
