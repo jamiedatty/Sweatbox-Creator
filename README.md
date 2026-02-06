@@ -1,40 +1,24 @@
-Sweatbox File Viewer/Creator
+# Sweatbox Creator
 
-A Python tkinter-based GUI application for viewing and analyzing EuroScope Sector Files (.ese) and Sector Files (.sct).
+A comprehensive application for creating VATSIM sweatbox training scenarios with ESE, SCT, and RWY file support.
 
 ## Features
 
-### File Loading
-- Load ESE (EuroScope Sector) files
-- Load SCT (Sector) files for additional data
-- Optional SCT file loading for airspace information
-
-### Views
-1. **Map View** (Interactive):
-   - Real map display using OpenStreetMap
-   - Controller positions with color coding
-   - Airports, VORs, NDBs, and fixes
-   - Airspace classes (A-G) with adjustable transparency
-   - Airways (high and low)
-   - Interactive tooltips and popups
-   - Zoom and pan functionality
-   - Multiple base map layers
-
-2. **Aircraft View**:
-   - SIDs/STARs display grouped by airport
-   - Procedure counts and names
-   - Placeholder for future aircraft management features
-
-3. **Controllers View**:
-   - Filterable table of controller positions
-   - Search by callsign, name, frequency, or type
-   - Color-coded by position type
-   - Export to CSV functionality
-   - Double-click for detailed view
+- **File Processing**: Parses ESE (controller schedules), SCT (sector/airport data), and RWY (runway) files
+- **Interactive Mapping**: Real-time geographic display with zoom/pan controls
+- **Multi-Airport Management**: Control multiple airports with automatic ICAO extraction
+- **Aircraft Generation**: Manual, automatic at entry fixes, and random realistic generation
+- **Controller Management**: Import positions from ESE files, manage frequencies
+- **Runway Visualization**: Extended runway centerlines (10 miles both directions)
+- **Entry Fix Detection**: Automatically identifies fixes within 100NM radius
+- **Three-Panel Interface**: Controls, interactive map, detailed lists
+- **Export System**: Generates standard sweatbox format files
+- **Drag & Drop Aircraft**: Move aircraft directly on the map with mouse
 
 ## Installation
 
-1. Install Python 3.7 or higher
-2. Install required packages:
-```bash
-pip install -r requirements.txt
+1. Install Python 3.8 or higher
+2. Extract this project
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
