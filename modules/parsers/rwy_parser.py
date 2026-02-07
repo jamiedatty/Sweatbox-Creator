@@ -164,25 +164,26 @@ class RWYParser:
                 return ils
         return None
     
-        def get_extended_centerlines(self):
-            """Get all extended centerlines"""
-            return [rwy for rwy in self.runways if rwy.get('extended', False)]
+    def get_extended_centerlines(self):
+        """Get all extended centerlines"""
+        return [rwy for rwy in self.runways if rwy.get('extended', False)]
     
-        def get_runways(self):
-            """Get all runways"""
-            return self.runways
+    def get_runways(self):
+        """Get all runways"""
+        return self.runways
 
-        def get_ils_data(self):
-            """Get all ILS data"""
-            return self.ils_data
+    def get_ils_data(self):
+        """Get all ILS data"""
+        return self.ils_data
 
-        def get_centerlines(self):
-            """Get all centerlines"""
-            return self.centerlines
+    def get_centerlines(self):
+        """Get all centerlines"""
+        return self.centerlines
 
-        def get_data(self):
-            return {
-                'runways': self.runways,
-                'ils_data': self.ils_data,
-                'centerlines': self.centerlines
-            }
+    def get_data(self):
+        """Get all parsed data as a dictionary"""
+        return {
+            'runways': self.runways,
+            'ils_data': self.ils_data,
+            'centerlines': self.centerlines
+        }

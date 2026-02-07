@@ -1,32 +1,11 @@
 import random
-import requests
+import re
 from datetime import datetime
-import json
 from tkinter import messagebox
 
 class RandomScenarioGenerator:
     def __init__(self, creator):
         self.creator = creator
-        
-        # Real airline callsigns with their typical routes
-        self.airlines = {
-            'SAA': {'name': 'South African Airways', 'routes': ['FAOR-FACT', 'FAOR-FALE', 'FAOR-FAGG', 'FAOR-FAPE']},
-            'BAW': {'name': 'British Airways', 'routes': ['FAOR-EGLL', 'FACT-EGLL']},
-            'UAL': {'name': 'United Airlines', 'routes': ['FAOR-KEWR', 'FAOR-KIAD']},
-            'DLH': {'name': 'Lufthansa', 'routes': ['FAOR-EDDF', 'FACT-EDDF']},
-            'AFR': {'name': 'Air France', 'routes': ['FAOR-LFPG', 'FACT-LFPG']},
-            'KLM': {'name': 'KLM Royal Dutch Airlines', 'routes': ['FAOR-EHAM', 'FACT-EHAM']},
-            'VIR': {'name': 'Virgin Atlantic', 'routes': ['FAOR-EGLL']},
-            'QTR': {'name': 'Qatar Airways', 'routes': ['FAOR-OTBD']},
-            'UAE': {'name': 'Emirates', 'routes': ['FAOR-OMDB']},
-            'THY': {'name': 'Turkish Airlines', 'routes': ['FAOR-LTBA']},
-            'SIA': {'name': 'Singapore Airlines', 'routes': ['FAOR-WSSS']},
-            'ANA': {'name': 'All Nippon Airways', 'routes': ['FAOR-RJTT']},
-            'AAL': {'name': 'American Airlines', 'routes': ['FAOR-KJFK']},
-            'DAL': {'name': 'Delta Air Lines', 'routes': ['FAOR-KATL']},
-            'EZY': {'name': 'EasyJet', 'routes': ['FAOR-EGSS']},
-            'RYR': {'name': 'Ryanair', 'routes': ['FACT-EIDW']}
-        }
         
         # Aircraft types by size/category
         self.aircraft_types = {
@@ -34,24 +13,6 @@ class RandomScenarioGenerator:
             'medium': ['A320', 'A321', 'A319', 'B738', 'B739', 'B737', 'A220'],
             'large': ['A333', 'A332', 'B789', 'B788', 'A359', 'A350', 'B77W', 'B77L'],
             'heavy': ['A388', 'B748', 'B77W', 'B77L', 'B744']
-        }
-        
-        # Common fixes in South African airspace
-        self.south_africa_fixes = [
-            'AVAGO', 'NIBEX', 'OKPIT', 'UNPOM', 'VEKOP', 'ETLIG',
-            'RAGUL', 'APDAK', 'EXOBI', 'NESAN', 'EVIPI', 'ETMIT',
-            'OR370', 'OR371', 'OR372', 'OR373', 'OR391', 'OR392',
-            'OR393', 'OR394', 'OR395', 'OR396', 'OR377'
-        ]
-        
-        # Position coordinates around major airports
-        self.positions = {
-            'FAOR': {'lat': -26.145, 'lon': 28.234},
-            'FACT': {'lat': -33.964, 'lon': 18.601},
-            'FALE': {'lat': -29.614, 'lon': 30.399},
-            'FAGG': {'lat': -34.005, 'lon': 22.378},
-            'FAPE': {'lat': -33.984, 'lon': 25.617},
-            'FAEL': {'lat': -33.035, 'lon': 27.825}
         }
     
     def generate_random_scenario(self):
@@ -76,101 +37,107 @@ class RandomScenarioGenerator:
             messagebox.showerror("Error", f"Failed to generate random scenario:\n{str(e)}")
     
     def generate_random_controllers(self):
-        """Generate random controller positions"""
+        """Generate random controller positions based on loaded airports"""
         controller_types = ['TWR', 'GND', 'APP', 'DEP', 'CTR', 'DEL', 'ATIS']
-        airports = ['FAOR', 'FACT', 'FALE', 'FAGG', 'FAPE', 'FAEL']
         
         # Clear existing controllers
         for item in self.creator.controller_tree.get_children():
             self.creator.controller_tree.delete(item)
         
-        # Generate center controllers
-        center_controllers = [
-            ('FAJA_CTR', '134.400', 'CTR'),
-            ('FAJA_NW_CTR', '126.700', 'CTR'),
-            ('FAJA_SW_CTR', '128.300', 'CTR'),
-            ('FAJA_SE_CTR', '132.150', 'CTR')
-        ]
+        # Get airports from map viewer
+        airports = []
+        if self.creator.map_viewer and hasattr(self.creator.map_viewer, 'loaded_airports'):
+            airports = self.creator.map_viewer.loaded_airports
         
-        for callsign, freq, ctype in center_controllers:
-            self.creator.controller_tree.insert('', 'end', values=(
-                callsign, freq, ctype, '✓'
-            ))
+        # If no airports loaded, use some defaults
+        if not airports:
+            airports = ['FAOR', 'FACT', 'FALE', 'FAGG', 'FAPE', 'FAEL']
         
-        # Generate airport-specific controllers
-        for airport in airports[:3]:  # Only first 3 airports
+        # Generate center controllers (first 3 characters of first airport + CTR)
+        if airports:
+            fir_prefix = airports[0][:3] if len(airports[0]) >= 3 else 'FAJ'
+            center_controllers = [
+                (f'{fir_prefix}A_CTR', '134.400', 'CTR'),
+                (f'{fir_prefix}A_NW_CTR', '126.700', 'CTR'),
+                (f'{fir_prefix}A_SW_CTR', '128.300', 'CTR'),
+                (f'{fir_prefix}A_SE_CTR', '132.150', 'CTR')
+            ]
+            
+            for callsign, freq, ctype in center_controllers:
+                self.creator.controller_tree.insert('', 'end', values=(
+                    callsign, freq, ctype, '✓'
+                ))
+        
+        # Generate airport-specific controllers for first 3 airports
+        for airport in airports[:3]:
+            # Generate frequencies
+            twr_freq = self.generate_frequency('TWR')
+            gnd_freq = self.generate_frequency('GND')
+            app_freq = self.generate_frequency('APP')
+            del_freq = self.generate_frequency('DEL')
+            atis_freq = self.generate_frequency('ATIS')
+            
             # Tower
             self.creator.controller_tree.insert('', 'end', values=(
-                f"{airport}_TWR", "118.100", 'TWR', '✓'
+                f"{airport}_TWR", twr_freq, 'TWR', '✓'
             ))
             # Ground
             self.creator.controller_tree.insert('', 'end', values=(
-                f"{airport}_GND", "121.900", 'GND', '✓'
+                f"{airport}_GND", gnd_freq, 'GND', '✓'
             ))
             # Approach/Departure
             self.creator.controller_tree.insert('', 'end', values=(
-                f"{airport}_APP", "124.500", 'APP', '✓'
+                f"{airport}_APP", app_freq, 'APP', '✓'
             ))
             # Delivery
             self.creator.controller_tree.insert('', 'end', values=(
-                f"{airport}_DEL", "121.700", 'DEL', '✓'
+                f"{airport}_DEL", del_freq, 'DEL', '✓'
             ))
             # ATIS
             self.creator.controller_tree.insert('', 'end', values=(
-                f"{airport}_ATIS", "126.200", 'ATIS', '✓'
+                f"{airport}_ATIS", atis_freq, 'ATIS', '✓'
             ))
     
+    def generate_frequency(self, controller_type):
+        """Generate realistic frequency based on controller type"""
+        if controller_type == 'TWR':
+            return f"118.{random.randint(1, 9):03d}"
+        elif controller_type == 'GND':
+            return f"121.{random.randint(1, 9):03d}"
+        elif controller_type == 'APP':
+            return f"124.{random.randint(1, 9):03d}"
+        elif controller_type == 'DEL':
+            return f"121.{random.randint(1, 9):03d}"
+        elif controller_type == 'ATIS':
+            return f"126.{random.randint(1, 9):03d}"
+        else:  # CTR
+            return f"{random.randint(118, 136)}.{random.randint(1, 9):03d}"
+    
     def generate_random_aircraft(self, index):
-        """Generate random aircraft with realistic data"""
-        # Select random airline
-        airline_code = random.choice(list(self.airlines.keys()))
+        """Generate random aircraft with dynamic data"""
+        # Generate random airline code (3 letters)
+        airline_code = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ', k=3))
         
         # Generate flight number
-        if airline_code in ['SAA', 'BAW', 'UAL']:
-            flight_num = random.randint(1, 999)
-        else:
-            flight_num = random.randint(100, 9999)
-        
+        flight_num = random.randint(1, 9999)
         callsign = f"{airline_code}{flight_num}"
         
-        # Select aircraft type based on airline and route
-        if airline_code in ['UAE', 'SIA', 'QTR']:
-            ac_type = random.choice(self.aircraft_types['heavy'] + self.aircraft_types['large'])
-        elif airline_code in ['EZY', 'RYR']:
-            ac_type = random.choice(self.aircraft_types['small'] + self.aircraft_types['medium'])
-        else:
-            ac_type = random.choice(self.aircraft_types['medium'] + self.aircraft_types['large'])
+        # Select aircraft type
+        category = random.choice(['small', 'medium', 'large', 'heavy'])
+        ac_type = random.choice(self.aircraft_types[category])
         
-        # Generate position
-        airport = random.choice(list(self.positions.keys()))
-        base_pos = self.positions[airport]
-        
-        # Add random offset for variety
-        lat = base_pos['lat'] + random.uniform(-2.0, 2.0)
-        lon = base_pos['lon'] + random.uniform(-2.0, 2.0)
+        # Generate position based on loaded airports
+        lat, lon = self.generate_random_position()
         position = f"{lat:.6f}, {lon:.6f}"
         
-        # Generate altitude based on aircraft type and position
-        if 'heavy' in ac_type or 'large' in ac_type:
+        # Generate altitude based on aircraft type
+        if category in ['heavy', 'large']:
             altitude = random.choice([28000, 32000, 35000, 38000])
         else:
             altitude = random.choice([5000, 8000, 10000, 12000, 15000, 18000])
         
         # Generate route
-        num_fixes = random.randint(3, 8)
-        route_fixes = random.sample(self.south_africa_fixes, min(num_fixes, len(self.south_africa_fixes)))
-        route = ' '.join(route_fixes)
-        
-        # Add altitude restrictions
-        if random.random() > 0.5:
-            fix_idx = random.randint(0, len(route_fixes)-2)
-            alt_restriction = random.choice([8000, 10000, 13000, 16000])
-            route = route.replace(route_fixes[fix_idx], f"{route_fixes[fix_idx]}/{alt_restriction}")
-        
-        # Add approach if near destination
-        if random.random() > 0.7:
-            runway = random.choice(['03R', '03L', '21R', '21L'])
-            route += f" ILS{runway}"
+        route = self.generate_random_route()
         
         # Generate speed and heading
         speed = str(random.randint(250, 480)).rjust(3)
@@ -187,6 +154,59 @@ class RandomScenarioGenerator:
             heading
         ))
     
+    def generate_random_position(self):
+        """Generate random position near loaded airports"""
+        # Get airports from map viewer
+        airports = []
+        if self.creator.map_viewer and hasattr(self.creator.map_viewer, 'loaded_airports'):
+            airports = self.creator.map_viewer.loaded_airports
+        
+        # If we have airports from SCT data, use those coordinates
+        if self.creator.sct_parser and hasattr(self.creator.sct_parser, 'get_data'):
+            data = self.creator.sct_parser.get_data()
+            if 'airports' in data and data['airports']:
+                airport = random.choice(data['airports'])
+                if 'latitude' in airport and 'longitude' in airport:
+                    lat = airport['latitude'] + random.uniform(-2.0, 2.0)
+                    lon = airport['longitude'] + random.uniform(-2.0, 2.0)
+                    return lat, lon
+        
+        # Default fallback position
+        return random.uniform(-90, 90), random.uniform(-180, 180)
+    
+    def generate_random_route(self):
+        """Generate random route using fixes from SCT data"""
+        route_parts = []
+        
+        # Get fixes from SCT parser if available
+        fixes = []
+        if self.creator.sct_parser and hasattr(self.creator.sct_parser, 'get_data'):
+            data = self.creator.sct_parser.get_data()
+            if 'fixes' in data:
+                fixes = [fix['name'] for fix in data['fixes'] if 'name' in fix]
+        
+        # If we have fixes, use them
+        if fixes:
+            num_fixes = random.randint(2, 6)
+            selected_fixes = random.sample(fixes, min(num_fixes, len(fixes)))
+            route_parts.extend(selected_fixes)
+        else:
+            # Generate generic route
+            route_parts = ['DCT', 'VOR1', 'VOR2']
+        
+        # Add altitude restrictions randomly
+        if random.random() > 0.5 and len(route_parts) > 1:
+            fix_idx = random.randint(0, len(route_parts)-2)
+            alt_restriction = random.choice([8000, 10000, 13000, 16000])
+            route_parts[fix_idx] = f"{route_parts[fix_idx]}/{alt_restriction}"
+        
+        # Add approach randomly
+        if random.random() > 0.7:
+            runway = random.choice(['03R', '03L', '21R', '21L', '09', '27', '18', '36'])
+            route_parts.append(f"ILS{runway}")
+        
+        return ' '.join(route_parts)
+    
     def generate_aircraft_at_entry_fixes(self, entry_fixes, airport_icao):
         """Generate aircraft at entry fixes"""
         if not entry_fixes:
@@ -199,13 +219,14 @@ class RandomScenarioGenerator:
         selected_fixes = random.sample(entry_fixes, num_aircraft)
         
         for i, fix in enumerate(selected_fixes):
-            # Select random airline
-            airline_code = random.choice(list(self.airlines.keys()))
+            # Generate airline code
+            airline_code = ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ', k=3))
             flight_num = random.randint(100, 999)
             callsign = f"{airline_code}{flight_num}"
             
             # Select aircraft type
-            ac_type = random.choice(self.aircraft_types['medium'] + self.aircraft_types['large'])
+            category = random.choice(['medium', 'large'])
+            ac_type = random.choice(self.aircraft_types[category])
             
             # Position at fix with small offset
             lat = fix['lat'] + random.uniform(-0.05, 0.05)
@@ -221,7 +242,7 @@ class RandomScenarioGenerator:
             else:
                 altitude = random.choice([14000, 16000, 18000])
             
-            # Generate route
+            # Generate route to airport
             route = self.generate_route_to_airport(fix['name'], airport_icao)
             
             # Speed and heading
@@ -242,46 +263,29 @@ class RandomScenarioGenerator:
     
     def generate_route_to_airport(self, fix_name, airport_icao):
         """Generate route from fix to airport"""
-        # Different route patterns based on airport
-        if airport_icao == 'FAOR':
-            patterns = [
-                f"{fix_name} VEKOP/13000 JS2T1/13000 JS2F1/8000 ILS03R",
-                f"{fix_name} ETLIG JS2T1/13000 JS2F1/8000 ILS03L",
-                f"{fix_name} OR377 VEKOP/13000 JS2T1/13000 JS2F1/8000 ILS21R",
-                f"{fix_name} OR391 OR392 ETLIG JS2T1/13000 JS2F1/8000 ILS21L",
-                f"{fix_name} AVAGO OR370 OR371 OR372 OR373"
-            ]
-        elif airport_icao == 'FACT':
-            patterns = [
-                f"{fix_name} DCT FACT",
-                f"{fix_name} NIBEX DCT FACT",
-                f"{fix_name} OR377 DCT FACT"
-            ]
-        elif airport_icao == 'FALE':
-            patterns = [
-                f"{fix_name} DCT FALE",
-                f"{fix_name} UNPOM DCT FALE",
-                f"{fix_name} OR391 OR392 DCT FALE"
-            ]
-        else:
-            # Generic route
-            patterns = [
-                f"{fix_name} DCT {airport_icao}",
-                f"{fix_name} VOR1 VOR2 {airport_icao}"
-            ]
+        # Get fixes from SCT parser if available
+        fixes = []
+        if self.creator.sct_parser and hasattr(self.creator.sct_parser, 'get_data'):
+            data = self.creator.sct_parser.get_data()
+            if 'fixes' in data:
+                fixes = [fix['name'] for fix in data['fixes'] if 'name' in fix]
         
-        return random.choice(patterns)
-    
-    def get_real_flight_plan(self, departure, arrival):
-        """Try to get real flight plan from online source (placeholder)"""
-        # This would connect to a flight planning API in a real implementation
-        # For now, return a simulated flight plan
+        # Create route
+        route_parts = [fix_name]
         
-        # Example route structures
-        route_templates = [
-            f"{departure} DCT {random.choice(self.south_africa_fixes)} DCT {arrival}",
-            f"{departure} {random.choice(self.south_africa_fixes)} {random.choice(self.south_africa_fixes)} {arrival}",
-            f"{departure} VOR1 VOR2 {random.choice(self.south_africa_fixes)} {arrival}"
-        ]
+        # Add intermediate fixes if available
+        if fixes and len(fixes) > 2:
+            num_intermediate = random.randint(1, 3)
+            intermediate_fixes = random.sample([f for f in fixes if f != fix_name], 
+                                             min(num_intermediate, len(fixes)-1))
+            route_parts.extend(intermediate_fixes)
         
-        return random.choice(route_templates)
+        # Add airport and approach
+        route_parts.append(airport_icao)
+        
+        # Add approach type randomly
+        if random.random() > 0.5:
+            runway = random.choice(['03R', '03L', '21R', '21L', '09', '27', '18', '36'])
+            route_parts.append(f"ILS{runway}")
+        
+        return ' '.join(route_parts)

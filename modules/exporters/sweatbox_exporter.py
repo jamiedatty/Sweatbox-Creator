@@ -30,17 +30,18 @@ class SweatboxExporter:
         lines.append(f"PSEUDOPILOT:{self.creator.master_controller}")
         lines.append("")
         
-        # Airport altitude
-        lines.append("AIRPORT_ALT:5558.0")
-        lines.append("")
+        # Airport altitude (removed hardcoded value - should be extracted from data)
+        # lines.append("AIRPORT_ALT:5558.0")  # REMOVED hardcoded value
+        # lines.append("")
         
         # ILS definitions from RWY file
         if hasattr(self.creator, 'rwy_parser') and self.creator.rwy_parser and hasattr(self.creator.rwy_parser, 'ils_data'):
             lines.append("; ILS Definitions")
             for ils in self.creator.rwy_parser.ils_data:
-                glideslope_lat, glideslope_lon = ils['glideslope']
-                localizer_lat, localizer_lon = ils['localizer']
-                lines.append(f"{ils['name']}:{glideslope_lat}:{glideslope_lon}:{localizer_lat}:{localizer_lon}")
+                if 'glideslope' in ils and 'localizer' in ils:
+                    glideslope_lat, glideslope_lon = ils['glideslope']
+                    localizer_lat, localizer_lon = ils['localizer']
+                    lines.append(f"{ils['name']}:{glideslope_lat}:{glideslope_lon}:{localizer_lat}:{localizer_lon}")
             lines.append("")
         
         # Controllers
@@ -71,9 +72,18 @@ class SweatboxExporter:
                         lat = float(lat_str.strip())
                         lon = float(lon_str.strip())
                     else:
-                        lat, lon = -26.145, 28.234  # Default FAOR
+                        # Default to first airport if available
+                        lat, lon = -26.145, 28.234  # Default fallback
+                        if self.creator.map_viewer and self.creator.map_viewer.loaded_airports:
+                            # Try to get airport coordinates from SCT
+                            if self.creator.sct_parser:
+                                data = self.creator.sct_parser.get_data()
+                                if 'airports' in data and data['airports']:
+                                    first_airport = data['airports'][0]
+                                    lat = first_airport.get('latitude', lat)
+                                    lon = first_airport.get('longitude', lon)
                 except:
-                    lat, lon = -26.145, 28.234  # Default FAOR
+                    lat, lon = -26.145, 28.234  # Default fallback
                 
                 # Clean altitude
                 alt_clean = altitude.replace('ft', '').strip()
@@ -101,21 +111,3 @@ class SweatboxExporter:
                 lines.append("")
         
         return '\n'.join(lines)
-    
-    def generate_euroscope_comment(self, aircraft_data):
-        """Generate EuroScope comment format for aircraft"""
-        # EuroScope comment format: ;callsign:field1:field2:...
-        # Example: ;SAA123:ALT:FL350:SPD:480:HDG:270
-        callsign = aircraft_data.get('callsign', '')
-        altitude = aircraft_data.get('altitude', '').replace('ft', '')
-        speed = aircraft_data.get('speed', '250')
-        heading = aircraft_data.get('heading', '000')
-        
-        comment = f";{callsign}:ALT:{altitude}:SPD:{speed}:HDG:{heading}"
-        
-        # Add route if available
-        route = aircraft_data.get('route', '')
-        if route:
-            comment += f":ROUTE:{route}"
-        
-        return comment

@@ -1,3 +1,4 @@
+# sct_parser_simple.py
 import re
 import json
 import os
@@ -182,9 +183,16 @@ class SCTParser:
             'fixes': self.fixes,
             'ARTCC_HIGH': self.artcc_high_boundaries,
             'ARTCC_LOW': self.artcc_low_boundaries,
+            'ARTCC': self.artcc_high_boundaries + self.artcc_low_boundaries,
             'version': self.version,
             'raw_sections': self.raw_data
         }
+        
+        print(f"DEBUG PARSER: Parsed {len(self.airports)} airports, {len(self.fixes)} fixes")
+        print(f"DEBUG PARSER: ARTCC HIGH: {len(self.artcc_high_boundaries)} boundaries")
+        print(f"DEBUG PARSER: ARTCC LOW: {len(self.artcc_low_boundaries)} boundaries")
+        print(f"DEBUG PARSER: Total segments - HIGH: {sum(len(b['segments']) for b in self.artcc_high_boundaries)}")
+        print(f"DEBUG PARSER: Total segments - LOW: {sum(len(b['segments']) for b in self.artcc_low_boundaries)}")
         
         return self.parsed_data
     
@@ -314,8 +322,8 @@ class SCTParser:
     
     def _coords_equal(self, coord1: Tuple[float, float], coord2: Tuple[float, float]) -> bool:
         """Check if two coordinates are approximately equal"""
-        return (abs(coord1[0] - coord2[0]) < 0.000001 and 
-                abs(coord1[1] - coord2[1]) < 0.000001)
+        return (abs(coord1[0] - coord2[0]) < 0.0001 and 
+                abs(coord1[1] - coord2[1]) < 0.0001)
     
     def _add_path_to_boundary(self, boundary: Dict, path: List[Tuple[float, float]]):
         """Convert a continuous path into segments and add to boundary"""
@@ -325,8 +333,8 @@ class SCTParser:
         # Create segments from the path
         for i in range(len(path) - 1):
             boundary['segments'].append({
-                'start': path[i],
-                'end': path[i + 1]
+                'start': {'lat': path[i][0], 'lon': path[i][1]},
+                'end': {'lat': path[i + 1][0], 'lon': path[i + 1][1]}
             })
     
     def _parse_raw_sections(self, content: str):
@@ -606,6 +614,7 @@ class SCTParser:
         summary.append(f"  - LOW segments: {total_low_segments}")
         return '\n'.join(summary)
 
+
 def parse_sct_file(file_path: str, validate: bool = True) -> Dict[str, Any]:
     parser = SCTParser(file_path)
     result = parser.parse()
@@ -617,9 +626,11 @@ def parse_sct_file(file_path: str, validate: bool = True) -> Dict[str, Any]:
     
     return result
 
+
 def quick_parse(file_path: str) -> str:
     parser = SCTParser(file_path)
     parser.parse()
     return parser.export_summary()
+
 
 __all__ = ['SCTParser', 'parse_sct_file', 'quick_parse', 'SCTSectionType', 'Coordinate', 'Runway', 'Frequency', 'Navaid']

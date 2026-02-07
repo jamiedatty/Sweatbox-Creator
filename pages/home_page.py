@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
-import os  # <-- ADD THIS LINE
+import os
 import sys
 
 class HomePage:
@@ -93,6 +93,8 @@ class HomePage:
                     return self.entry_fixes
                 def get_selected_airport(self): 
                     return self.selected_airport
+                def select_aircraft(self, callsign):
+                    return False
                 def setup_ui(self): 
                     # Create a simple frame
                     frame = tk.Frame(self.parent, bg='white')
@@ -177,6 +179,14 @@ class HomePage:
                  command=self.clear_all_aircraft,
                  bg='#c0392b', fg='white').pack(fill=tk.X, pady=5)
         
+        # Test button (temporary)
+        test_frame = tk.LabelFrame(parent, text="Debug", padx=10, pady=10)
+        test_frame.pack(fill=tk.X, padx=10, pady=10)
+        
+        tk.Button(test_frame, text="Test Aircraft Features", 
+                 command=self.test_aircraft_features,
+                 bg='#ff9900', fg='white').pack(fill=tk.X, pady=5)
+        
         # Status label
         self.status_label = tk.Label(parent, text="Ready", bg='#f0f0f0', fg='#666666')
         self.status_label.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=10)
@@ -223,6 +233,9 @@ class HomePage:
             self.aircraft_details_tree.heading(col, text=col)
             self.aircraft_details_tree.column(col, width=100)
         
+        # Bind selection event
+        self.aircraft_details_tree.bind('<<TreeviewSelect>>', self.on_aircraft_tree_select)
+        
         # Scrollbars
         y_scrollbar = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=self.aircraft_details_tree.yview)
         x_scrollbar = ttk.Scrollbar(main_frame, orient=tk.HORIZONTAL, command=self.aircraft_details_tree.xview)
@@ -244,6 +257,7 @@ class HomePage:
         tk.Button(btn_frame, text="Edit Selected", command=self.edit_aircraft).pack(side=tk.LEFT, padx=5)
         tk.Button(btn_frame, text="Delete Selected", command=self.delete_aircraft).pack(side=tk.LEFT, padx=5)
         tk.Button(btn_frame, text="Update Map", command=self.update_aircraft_on_map).pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text="Select on Map", command=self.select_selected_on_map).pack(side=tk.LEFT, padx=5)
     
     def setup_controller_tab(self, parent):
         # Create treeview for controllers
@@ -296,6 +310,19 @@ class HomePage:
         tk.Button(btn_frame, text="Apply Route to Selected Aircraft", 
                  command=self.apply_route_to_selected).pack(side=tk.LEFT, padx=5)
     
+    def extract_airports_from_controllers(self, positions):
+        """Extract unique airport ICAOs from controller positions (everything before underscore)"""
+        airports = set()
+        for pos in positions:
+            callsign = pos.get('callsign', '')
+            if '_' in callsign:
+                # Take everything before the first underscore
+                airport = callsign.split('_')[0]
+                # Only add if it looks like an airport code (4 letters)
+                if len(airport) == 4 and airport.isalpha():
+                    airports.add(airport)
+        return sorted(list(airports))
+    
     def load_ese_file(self):
         file_path = filedialog.askopenfilename(
             title="Select ESE File",
@@ -305,30 +332,43 @@ class HomePage:
             try:
                 self.ese_parser = self.ESEParser(file_path)
                 
+                # Extract airports from controller positions
+                positions = []
+                if hasattr(self.ese_parser, 'get_positions'):
+                    positions = self.ese_parser.get_positions()
+                
+                # Extract airports (everything before underscore)
+                airports = self.extract_airports_from_controllers(positions)
+                
+                # Update map viewer with extracted airports
+                if self.map_viewer and hasattr(self.map_viewer, 'update_airports'):
+                    self.map_viewer.update_airports(airports)
+                
                 # Clear existing controllers
                 if self.controller_tree:
                     for item in self.controller_tree.get_children():
                         self.controller_tree.delete(item)
                 
-                # Add controllers to tree
-                if hasattr(self.ese_parser, 'get_positions'):
-                    positions = self.ese_parser.get_positions()
-                    for pos in positions:
-                        # Skip _FSS and some _CTR positions
-                        if '_FSS' in pos.get('callsign', '') or ('_CTR' in pos.get('callsign', '') and not any(x in pos.get('callsign', '') for x in ['FAJA', 'FACA', 'FALE'])):
-                            continue
-                        
-                        self.controller_tree.insert('', 'end', values=(
-                            pos.get('callsign', ''),
-                            pos.get('frequency', ''),
-                            pos.get('type', ''),
-                            '✓'  # Default to simulated
-                        ))
+                # Add controllers to tree - DEFAULT TO ✗ (OFF)
+                for pos in positions:
+                    # Skip _FSS and some _CTR positions if needed
+                    if '_FSS' in pos.get('callsign', ''):
+                        continue
                     
-                    messagebox.showinfo("Success", f"Loaded ESE file: {file_path}\n{len(positions)} positions found.")
-                    self.status_label.config(text=f"Loaded ESE: {os.path.basename(file_path)}")
-                else:
-                    messagebox.showinfo("Info", "ESE parser loaded but get_positions not available")
+                    self.controller_tree.insert('', 'end', values=(
+                        pos.get('callsign', ''),
+                        pos.get('frequency', ''),
+                        pos.get('type', ''),
+                        '✗'  # DEFAULT TO OFF (not simulated)
+                    ))
+                
+                messagebox.showinfo("Success", 
+                    f"Loaded ESE file: {file_path}\n"
+                    f"Positions found: {len(positions)}\n"
+                    f"Airports extracted: {len(airports)}\n"
+                    f"Airports: {', '.join(airports[:10])}{'...' if len(airports) > 10 else ''}"
+                )
+                self.status_label.config(text=f"Loaded ESE: {os.path.basename(file_path)} - {len(positions)} positions, {len(airports)} airports")
                 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load ESE file: {str(e)}")
@@ -341,15 +381,34 @@ class HomePage:
         if file_path:
             try:
                 self.sct_parser = self.SCTParser(file_path)
-                self.sct_parser.parse()
-                messagebox.showinfo("Success", f"Loaded SCT file: {file_path}")
+                data = self.sct_parser.parse()
                 
-                # Update map viewer
+                # Show detailed info about what was loaded
+                airports_count = len(data.get('airports', []))
+                fixes_count = len(data.get('fixes', []))
+                runways_count = len(data.get('runways', []))
+                vor_count = len(data.get('VOR', []))
+                ndb_count = len(data.get('NDB', []))
+                artcc_high_count = len(data.get('ARTCC_HIGH', []))
+                artcc_low_count = len(data.get('ARTCC_LOW', []))
+                
+                messagebox.showinfo("Success", 
+                    f"Loaded SCT file: {file_path}\n"
+                    f"Airports: {airports_count}\n"
+                    f"Fixes: {fixes_count}\n"
+                    f"Runways: {runways_count}\n"
+                    f"VORs: {vor_count}\n"
+                    f"NDBs: {ndb_count}\n"
+                    f"ARTCC High: {artcc_high_count} boundaries\n"
+                    f"ARTCC Low: {artcc_low_count} boundaries"
+                )
+                
+                # Update map viewer - LOAD DATA IMMEDIATELY
                 if self.map_viewer:
                     self.map_viewer.sct_parser = self.sct_parser
-                    self.map_viewer.load_data()
+                    self.map_viewer.load_data()  # This should draw data to map
                 
-                self.status_label.config(text=f"Loaded SCT: {os.path.basename(file_path)}")
+                self.status_label.config(text=f"Loaded SCT: {os.path.basename(file_path)} - {airports_count} airports, {fixes_count} fixes")
                 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load SCT file: {str(e)}")
@@ -362,15 +421,26 @@ class HomePage:
         if file_path:
             try:
                 self.rwy_parser = self.RWYParser(file_path)
-                self.rwy_parser.parse()
-                messagebox.showinfo("Success", f"Loaded RWY file: {file_path}")
+                data = self.rwy_parser.parse()
                 
-                # Update map viewer
+                # Check if data was parsed
+                runways_count = len(data.get('runways', []))
+                ils_count = len(data.get('ils_data', []))
+                centerlines_count = len(data.get('centerlines', []))
+                
+                messagebox.showinfo("Success", 
+                    f"Loaded RWY file: {file_path}\n"
+                    f"Runways: {runways_count}\n"
+                    f"ILS Data: {ils_count}\n"
+                    f"Centerlines: {centerlines_count}"
+                )
+                
+                # Update map viewer - LOAD DATA IMMEDIATELY
                 if self.map_viewer:
                     self.map_viewer.rwy_parser = self.rwy_parser
-                    self.map_viewer.load_data()
+                    self.map_viewer.load_data()  # This should draw data to map
                 
-                self.status_label.config(text=f"Loaded RWY: {os.path.basename(file_path)}")
+                self.status_label.config(text=f"Loaded RWY: {os.path.basename(file_path)} - {runways_count} runways, {ils_count} ILS")
                 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load RWY file: {str(e)}")
@@ -432,7 +502,7 @@ class HomePage:
         # Simple dialog to add aircraft
         dialog = tk.Toplevel(self.parent)
         dialog.title("Add Aircraft")
-        dialog.geometry("400x300")
+        dialog.geometry("400x350")
         dialog.transient(self.parent)
         dialog.grab_set()
         
@@ -461,6 +531,16 @@ class HomePage:
         route_entry.pack(pady=5)
         route_entry.insert(0, "DCT FAOR")
         
+        tk.Label(dialog, text="Speed (kts):").pack(pady=(10, 0))
+        speed_entry = tk.Entry(dialog, width=30)
+        speed_entry.pack(pady=5)
+        speed_entry.insert(0, "250")
+        
+        tk.Label(dialog, text="Heading (deg):").pack(pady=(10, 0))
+        heading_entry = tk.Entry(dialog, width=30)
+        heading_entry.pack(pady=5)
+        heading_entry.insert(0, "000")
+        
         def save_aircraft():
             values = (
                 callsign_entry.get(),
@@ -468,8 +548,8 @@ class HomePage:
                 f"{alt_entry.get()}ft",
                 pos_entry.get(),
                 route_entry.get(),
-                "250",  # Default speed
-                "000"   # Default heading
+                speed_entry.get(),
+                heading_entry.get()
             )
             self.aircraft_details_tree.insert('', 'end', values=values)
             dialog.destroy()
@@ -674,13 +754,54 @@ class HomePage:
     
     def on_aircraft_position_update(self, callsign, new_position):
         """Handle aircraft position update from map"""
+        print(f"DEBUG: Updating position for {callsign} to {new_position}")
+        
+        # Update in aircraft tree
         for item in self.aircraft_details_tree.get_children():
             values = self.aircraft_details_tree.item(item, 'values')
             if values and values[0] == callsign:
                 new_values = list(values)
-                new_values[3] = new_position
+                new_values[3] = new_position  # Update position field
                 self.aircraft_details_tree.item(item, values=tuple(new_values))
+                print(f"✓ Updated {callsign} position in tree")
                 break
+        
+        # Update map
+        if self.map_viewer:
+            self.map_viewer.redraw_all()
+        
+        self.status_label.config(text=f"Updated position for {callsign}")
+    
+    def on_aircraft_tree_select(self, event):
+        """Handle aircraft selection in tree"""
+        selected = self.aircraft_details_tree.selection()
+        if selected:
+            item = selected[0]
+            values = self.aircraft_details_tree.item(item, 'values')
+            if values:
+                callsign = values[0]
+                self.select_aircraft_on_map(callsign)
+    
+    def select_aircraft_on_map(self, callsign):
+        """Select aircraft on map from tree selection"""
+        if self.map_viewer and hasattr(self.map_viewer, 'select_aircraft'):
+            success = self.map_viewer.select_aircraft(callsign)
+            if success:
+                self.status_label.config(text=f"Selected {callsign} on map")
+            else:
+                self.status_label.config(text=f"Aircraft {callsign} not found on map")
+    
+    def select_selected_on_map(self):
+        """Select currently selected aircraft on map"""
+        selected = self.aircraft_details_tree.selection()
+        if selected:
+            item = selected[0]
+            values = self.aircraft_details_tree.item(item, 'values')
+            if values:
+                callsign = values[0]
+                self.select_aircraft_on_map(callsign)
+        else:
+            messagebox.showwarning("Warning", "Please select an aircraft first.")
     
     def get_simulated_controllers(self):
         """Get controllers marked for simulation"""
@@ -695,6 +816,46 @@ class HomePage:
                         'type': values[2]
                     })
         return controllers
+    
+    def test_aircraft_features(self):
+        """Test aircraft features with sample data"""
+        # Add some test aircraft with different headings
+        test_aircraft = [
+            {
+                'callsign': 'SAA101',
+                'type': 'A320',
+                'altitude': '35000ft',
+                'position': '-26.145, 28.234',
+                'route': 'DCT FAOR',
+                'speed': '480',
+                'heading': '045'  # Northeast
+            },
+            {
+                'callsign': 'SAA202',
+                'type': 'B738',
+                'altitude': '28000ft',
+                'position': '-26.100, 28.300',
+                'route': 'DCT FACT',
+                'speed': '420',
+                'heading': '180'  # South
+            },
+            {
+                'callsign': 'SAA303',
+                'type': 'A333',
+                'altitude': '38000ft',
+                'position': '-26.200, 28.150',
+                'route': 'DCT FALE',
+                'speed': '520',
+                'heading': '270'  # West
+            }
+        ]
+        
+        for aircraft in test_aircraft:
+            self.add_aircraft_from_dict(aircraft)
+        
+        self.update_aircraft_on_map()
+        messagebox.showinfo("Test", "Added 3 test aircraft with different headings")
+        self.status_label.config(text="Added test aircraft with heading indicators")
 
 # For backward compatibility
 SweatboxCreatorPage = HomePage
