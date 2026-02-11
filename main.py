@@ -2,9 +2,16 @@
 """
 Sweatbox Creator - Main Application
 Loads SCT and ESE files and displays data on an interactive map
+
+macOS Compatible Version
 """
 
 import tkinter as tk
+from tkinter import ttk, messagebox, filedialog, simpledialog
+import os
+import sys
+
+# Import pages
 from pages.splash_page import SplashPage
 from pages.home_page import HomePage
 from pages.under_development_page import UnderDevelopmentPage
@@ -16,16 +23,10 @@ class SweatboxCreatorApp:
         self.root.geometry("1400x900")
         self.root.minsize(1200, 800)
 
-        try:
-            self.root.iconbitmap('icon.ico')
-        except:
-            pass
-
         # Test for tkintermapview
         try:
             from tkintermapview import TkinterMapView
         except ImportError:
-            import tkinter.messagebox as messagebox
             messagebox.showerror(
                 "Missing Dependency",
                 "tkintermapview is not installed!\n\n"
@@ -78,4 +79,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -3,6 +3,122 @@ from tkinter import ttk, messagebox, filedialog, simpledialog
 import os
 import sys
 
+def get_macos_colors():
+    """Get macOS-compatible color palette"""
+    return {
+        # Background colors
+        'background': '#F5F5F7',       # macOS system gray
+        'surface': '#FFFFFF',           # Pure white for cards
+        'surface_alternate': '#F0F0F2', # Alternate surface
+        
+        # Primary colors
+        'primary': '#007AFF',           # macOS blue
+        'primary_dark': '#0056B3',      # Darker blue
+        'primary_light': '#5AC8FA',     # Light blue
+        
+        # Status colors
+        'success': '#34C759',           # macOS green
+        'success_dark': '#248A3D',      # Dark green
+        'warning': '#FF9500',          # macOS orange
+        'danger': '#FF3B30',           # macOS red
+        'info': '#00C7BE',             # macOS teal
+        
+        # Text colors
+        'text': '#1D1D1F',             # macOS text primary
+        'text_secondary': '#86868B',    # macOS text secondary
+        'text_hint': '#AEAEB2',         # macOS text tertiary
+        
+        # UI element colors
+        'border': '#D2D2D7',            # macOS separator
+        'divider': '#E5E5EA',           # Lighter divider
+        'shadow': '#00000020',           # Soft shadow
+        
+        # Gradient colors
+        'gradient_start': '#007AFF',
+        'gradient_end': '#5AC8FA',
+        
+        # Special colors
+        'accent': '#007AFF',
+        'highlight': '#34C759',
+        
+        # Status bar colors
+        'status_background': '#2C2C2E',
+        'status_text': '#FFFFFF',
+        'status_indicator': '#30D158',
+        
+        # Card colors
+        'card_background': '#FFFFFF',
+        'card_border': '#D2D2D7',
+        
+        # White
+        'white': '#FFFFFF',
+    }
+
+def get_windows_colors():
+    """Get Windows-compatible color palette"""
+    return {
+        # Background colors
+        'background': '#e3f2fd',        # Very light blue
+        'surface': '#ffffff',            # Pure white
+        'surface_alternate': '#ffffff',
+        
+        # Primary colors
+        'primary': '#1976d2',           # Deep blue
+        'primary_dark': '#1565c0',      # Darker blue
+        'primary_light': '#42a5f5',     # Light blue
+        
+        # Status colors
+        'success': '#4caf50',           # Green
+        'success_dark': '#388e3c',      # Dark green
+        'warning': '#ff9800',           # Orange
+        'danger': '#f44336',            # Red
+        'info': '#03dac6',             # Teal
+        
+        # Text colors
+        'text': '#0d47a1',             # Dark blue text
+        'text_secondary': '#455a64',    # Blue-gray
+        'text_hint': '#78909c',         # Light blue-gray
+        
+        # UI element colors
+        'border': '#bbdefb',            # Light blue border
+        'divider': '#e3f2fd',          # Light blue dividers
+        'shadow': '#00000015',          # Soft shadow
+        
+        # Gradient colors
+        'gradient_start': '#1976d2',
+        'gradient_end': '#42a5f5',
+        
+        # Special colors
+        'accent': '#2196f3',
+        'highlight': '#64b5f6',
+        
+        # Status bar colors
+        'status_background': '#34495e',
+        'status_text': '#ecf0f1',
+        'status_indicator': '#27ae60',
+        
+        # Card colors
+        'card_background': '#ffffff',
+        'card_border': '#bbdefb',
+        
+        # White
+        'white': '#ffffff',
+    }
+
+def get_platform_colors():
+    """Get colors appropriate for the current platform"""
+    if sys.platform == 'darwin':
+        return get_macos_colors()
+    else:
+        return get_windows_colors()
+
+def get_platform_font():
+    """Get appropriate font for the current platform"""
+    if sys.platform == 'darwin':
+        return 'SF Pro Text'
+    else:
+        return 'Segoe UI'
+
 class HomePage:
     def __init__(self, parent):
         self.parent = parent
@@ -13,6 +129,10 @@ class HomePage:
         self.master_controller = "SYS"
         self.aircraft_details_tree = None
         self.controller_tree = None
+        
+        # Get platform-specific colors and font
+        self.colors = get_platform_colors()
+        self.font_name = get_platform_font()
         
         # Add project root to path for imports
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -112,41 +232,15 @@ class HomePage:
         self.setup_ui()
     
     def setup_styles(self):
-        """Configure spectacular modern styling with gradients and effects"""
+        """Configure modern styling with platform-compatible colors"""
         style = ttk.Style()
 
-        # Spectacular blue-based color palette
-        self.colors = {
-            'primary': '#1976d2',      # Deep blue
-            'primary_dark': '#1565c0', # Darker blue
-            'primary_light': '#42a5f5', # Light blue
-            'secondary': '#2196f3',    # Bright blue
-            'secondary_dark': '#1976d2', # Medium blue
-            'success': '#4caf50',      # Green
-            'success_dark': '#388e3c', # Dark green
-            'warning': '#ff9800',      # Orange
-            'danger': '#f44336',       # Red
-            'info': '#03dac6',         # Teal
-            'dark': '#263238',         # Dark blue-gray
-            'light': '#f5f5f5',        # Light gray
-            'white': '#ffffff',
-            'surface': '#ffffff',      # Card surface
-            'background': '#e3f2fd',   # Very light blue
-            'border': '#bbdefb',       # Light blue border
-            'text': '#0d47a1',         # Dark blue text
-            'text_secondary': '#455a64', # Blue-gray
-            'text_hint': '#78909c',    # Light blue-gray
-            'divider': '#e3f2fd',      # Light blue dividers
-            'shadow': '#00000015',    # Soft shadow
-            'gradient_start': '#1976d2', # Deep blue
-            'gradient_end': '#42a5f5',   # Light blue
-            'accent': '#2196f3',       # Bright blue
-            'highlight': '#64b5f6'     # Medium light blue
-        }
+        # Use platform-specific colors (already initialized in __init__)
+        # self.colors is already set from get_platform_colors()
 
         # Configure modern button styles with proper hover effects
         style.configure('Action.TButton',
-                       font=('Segoe UI', 10, 'bold'),
+                       font=(self.font_name, 10, 'bold'),
                        padding=[16, 8],
                        relief='flat',
                        borderwidth=0,
@@ -156,7 +250,7 @@ class HomePage:
         style.configure('Primary.TButton',
                        background=self.colors['primary'],
                        foreground=self.colors['white'],
-                       font=('Segoe UI', 10, 'bold'),
+                       font=(self.font_name, 10, 'bold'),
                        padding=[16, 8],
                        relief='flat',
                        borderwidth=0)
@@ -164,7 +258,7 @@ class HomePage:
         style.configure('Success.TButton',
                        background=self.colors['success'],
                        foreground=self.colors['white'],
-                       font=('Segoe UI', 10, 'bold'),
+                       font=(self.font_name, 10, 'bold'),
                        padding=[16, 8],
                        relief='flat',
                        borderwidth=0)
@@ -172,7 +266,7 @@ class HomePage:
         style.configure('Warning.TButton',
                        background=self.colors['warning'],
                        foreground=self.colors['white'],
-                       font=('Segoe UI', 10, 'bold'),
+                       font=(self.font_name, 10, 'bold'),
                        padding=[16, 8],
                        relief='flat',
                        borderwidth=0)
@@ -180,23 +274,23 @@ class HomePage:
         style.configure('Danger.TButton',
                        background=self.colors['danger'],
                        foreground=self.colors['white'],
-                       font=('Segoe UI', 10, 'bold'),
+                       font=(self.font_name, 10, 'bold'),
                        padding=[16, 8],
                        relief='flat',
                        borderwidth=0)
 
         style.configure('Secondary.TButton',
-                       background=self.colors['secondary'],
+                       background=self.colors['primary'],
                        foreground=self.colors['white'],
-                       font=('Segoe UI', 10, 'bold'),
+                       font=(self.font_name, 10, 'bold'),
                        padding=[16, 8],
                        relief='flat',
                        borderwidth=0)
 
         style.configure('Outline.TButton',
-                       background=self.colors['white'],
+                       background=self.colors['surface'],
                        foreground=self.colors['primary'],
-                       font=('Segoe UI', 10, 'bold'),
+                       font=(self.font_name, 10, 'bold'),
                        padding=[14, 6],
                        relief='solid',
                        borderwidth=2,
@@ -212,11 +306,11 @@ class HomePage:
         style.configure('Card.TLabelframe.Label',
                        background=self.colors['surface'],
                        foreground=self.colors['text'],
-                       font=('Segoe UI', 12, 'bold'))
+                       font=(self.font_name, 12, 'bold'))
 
         # Configure modern treeview with alternating rows
         style.configure('Modern.Treeview',
-                       font=('Segoe UI', 9),
+                       font=(self.font_name, 9),
                        rowheight=32,
                        background=self.colors['surface'],
                        fieldbackground=self.colors['surface'],
@@ -224,8 +318,8 @@ class HomePage:
                        relief='flat')
 
         style.configure('Modern.Treeview.Heading',
-                       font=('Segoe UI', 10, 'bold'),
-                       background=self.colors['light'],
+                       font=(self.font_name, 10, 'bold'),
+                       background=self.colors['surface'],
                        foreground=self.colors['text'],
                        borderwidth=0,
                        relief='flat')
@@ -237,9 +331,9 @@ class HomePage:
                        relief='flat')
 
         style.configure('Modern.TNotebook.Tab',
-                       background=self.colors['light'],
+                       background=self.colors['surface'],
                        foreground=self.colors['text_secondary'],
-                       font=('Segoe UI', 10, 'bold'),
+                       font=(self.font_name, 10, 'bold'),
                        padding=[24, 12],
                        borderwidth=0,
                        relief='flat')
@@ -250,7 +344,7 @@ class HomePage:
 
         # Configure modern entry fields
         style.configure('Modern.TEntry',
-                       font=('Segoe UI', 10),
+                       font=(self.font_name, 10),
                        padding=10,
                        relief='flat',
                        borderwidth=1,
@@ -259,29 +353,29 @@ class HomePage:
 
         # Configure modern labels
         style.configure('Modern.TLabel',
-                       font=('Segoe UI', 10),
+                       font=(self.font_name, 10),
                        background=self.colors['surface'],
                        foreground=self.colors['text'])
 
         style.configure('Header.TLabel',
-                       font=('Segoe UI', 16, 'bold'),
+                       font=(self.font_name, 16, 'bold'),
                        background=self.colors['surface'],
                        foreground=self.colors['text'])
 
         style.configure('Subheader.TLabel',
-                       font=('Segoe UI', 12, 'bold'),
+                       font=(self.font_name, 12, 'bold'),
                        background=self.colors['surface'],
                        foreground=self.colors['text'])
 
         style.configure('Caption.TLabel',
-                       font=('Segoe UI', 9),
+                       font=(self.font_name, 9),
                        background=self.colors['surface'],
                        foreground=self.colors['text_secondary'])
 
         # Configure modern progress bars
         style.configure('Modern.Horizontal.TProgressbar',
                        background=self.colors['primary'],
-                       troughcolor=self.colors['light'],
+                       troughcolor=self.colors['surface'],
                        borderwidth=0,
                        lightcolor=self.colors['primary'],
                        darkcolor=self.colors['primary'])
@@ -290,33 +384,67 @@ class HomePage:
         # Configure modern style
         self.setup_styles()
 
-        # Main container with spectacular gradient background
-        self.main_container = tk.Frame(self.parent, bg=self.colors['background'])
+        # Main container with platform-compatible background
+        self.main_container = tk.Frame(
+            self.parent, 
+            bg=self.colors['background'],
+            highlightthickness=0,
+            relief='flat'
+        )
         self.main_container.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
 
         # Top header bar
         self.setup_header_bar()
 
-        # Main content area with gradient background
-        content_frame = tk.Frame(self.main_container, bg=self.colors['background'])
+        # Main content area
+        content_frame = tk.Frame(
+            self.main_container, 
+            bg=self.colors['background'],
+            highlightthickness=0,
+            relief='flat'
+        )
         content_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=15)
 
-        # Main paned window for three-panel layout with spectacular styling
-        main_paned = tk.PanedWindow(content_frame, orient=tk.HORIZONTAL,
-                                   sashrelief=tk.FLAT, sashwidth=8,
-                                   bg=self.colors['divider'])
+        # Main paned window for three-panel layout
+        main_paned = tk.PanedWindow(
+            content_frame, 
+            orient=tk.HORIZONTAL,
+            sashrelief=tk.FLAT, 
+            sashwidth=8,
+            bg=self.colors['divider'],
+            highlightthickness=0,
+            relief='flat'
+        )
         main_paned.pack(fill=tk.BOTH, expand=True)
 
-        # Left panel - controls (spectacular gradient sidebar)
-        left_panel = tk.Frame(main_paned, bg=self.colors['surface'], relief='raised', borderwidth=2)
+        # Left panel - controls
+        left_panel = tk.Frame(
+            main_paned, 
+            bg=self.colors['surface'], 
+            relief='raised', 
+            borderwidth=2,
+            highlightthickness=0
+        )
         main_paned.add(left_panel, minsize=360)
 
-        # Center panel - map (main content area with gradient)
-        center_panel = tk.Frame(main_paned, bg=self.colors['surface'], relief='raised', borderwidth=2)
+        # Center panel - map
+        center_panel = tk.Frame(
+            main_paned, 
+            bg=self.colors['surface'], 
+            relief='raised', 
+            borderwidth=2,
+            highlightthickness=0
+        )
         main_paned.add(center_panel, minsize=780)
 
-        # Right panel - details (info panel with gradient)
-        right_panel = tk.Frame(main_paned, bg=self.colors['surface'], relief='raised', borderwidth=2)
+        # Right panel - details
+        right_panel = tk.Frame(
+            main_paned, 
+            bg=self.colors['surface'], 
+            relief='raised', 
+            borderwidth=2,
+            highlightthickness=0
+        )
         main_paned.add(right_panel, minsize=360)
 
         self.setup_left_panel(left_panel)
@@ -331,226 +459,467 @@ class HomePage:
 
 
     def setup_header_bar(self):
-        """Create spectacular gradient header bar with modern styling"""
-        # Create gradient effect using multiple frames
-        header_frame = tk.Frame(self.main_container, height=70)
+        """Create header bar with platform-compatible styling"""
+        # Create gradient effect using frames
+        header_frame = tk.Frame(self.main_container, height=70, bg=self.colors['gradient_start'])
         header_frame.pack(fill=tk.X, side=tk.TOP)
         header_frame.pack_propagate(False)
 
-        # Gradient background using layered frames
-        gradient_frame1 = tk.Frame(header_frame, bg=self.colors['gradient_start'], height=70)
-        gradient_frame1.pack(fill=tk.X)
-        gradient_frame1.pack_propagate(False)
+        gradient_frame = tk.Frame(header_frame, bg=self.colors['gradient_end'], highlightthickness=0, relief='flat')
+        gradient_frame.pack(fill=tk.X, padx=2, pady=2)
+        gradient_frame.pack_propagate(False)
 
-        gradient_frame2 = tk.Frame(gradient_frame1, bg=self.colors['gradient_end'], height=70)
-        gradient_frame2.pack(fill=tk.X, padx=2, pady=2)
-        gradient_frame2.pack_propagate(False)
-
-        # Logo/title area with spectacular styling
-        title_frame = tk.Frame(gradient_frame2, bg=self.colors['gradient_end'])
+        # Logo/title area
+        title_frame = tk.Frame(gradient_frame, bg=self.colors['gradient_end'], highlightthickness=0, relief='flat')
         title_frame.pack(side=tk.LEFT, padx=25, pady=12)
 
-        # Spectacular title with gradient effect simulation
-        title_label = tk.Label(title_frame, text="✈️ SWEATBOX CREATOR",
-                              font=('Segoe UI', 20, 'bold'),
-                              fg='#ffffff', bg=self.colors['gradient_end'])
+        # Title with platform-compatible font
+        title_label = tk.Label(
+            title_frame, 
+            text="✈️ SWEATBOX CREATOR",
+            font=(self.font_name, 20, 'bold'),
+            fg='#ffffff', 
+            bg=self.colors['gradient_end'],
+            highlightthickness=0,
+            relief='flat'
+        )
         title_label.pack(side=tk.TOP, anchor=tk.W)
 
-        subtitle_label = tk.Label(title_frame, text="✨ Professional ATC Scenario Builder ✨",
-                                 font=('Segoe UI', 10, 'bold'),
-                                 fg='#e8f4f8', bg=self.colors['gradient_end'])
+        subtitle_label = tk.Label(
+            title_frame, 
+            text="✨ Professional ATC Scenario Builder ✨",
+            font=(self.font_name, 10, 'bold'),
+            fg='#e8f4f8', 
+            bg=self.colors['gradient_end'],
+            highlightthickness=0,
+            relief='flat'
+        )
         subtitle_label.pack(side=tk.TOP, anchor=tk.W, pady=(2, 0))
 
-        # Quick actions area with spectacular buttons
-        actions_frame = tk.Frame(gradient_frame2, bg=self.colors['gradient_end'])
+        # Quick actions area
+        actions_frame = tk.Frame(gradient_frame, bg=self.colors['gradient_end'], highlightthickness=0, relief='flat')
         actions_frame.pack(side=tk.RIGHT, padx=25, pady=12)
 
-        # Spectacular gradient buttons
-        save_btn = tk.Button(actions_frame, text="💾 SAVE SCENARIO",
-                           font=('Segoe UI', 9, 'bold'),
-                           bg=self.colors['success'], fg='white',
-                           relief='flat', padx=18, pady=10, borderwidth=0,
-                           activebackground=self.colors['success_dark'],
-                           command=self.export_sweatbox)
+        # Buttons with platform-compatible styling
+        button_font = (self.font_name, 9, 'bold')
+        
+        save_btn = tk.Button(
+            actions_frame, 
+            text="💾 SAVE SCENARIO",
+            font=button_font,
+            bg=self.colors['success'], 
+            fg='white',
+            relief='flat', 
+            padx=18, 
+            pady=10, 
+            borderwidth=0,
+            highlightthickness=0,
+            activebackground=self.colors['success_dark'],
+            command=self.export_sweatbox
+        )
         save_btn.pack(side=tk.LEFT, padx=3)
 
-        load_btn = tk.Button(actions_frame, text="📁 LOAD FILE",
-                           font=('Segoe UI', 9, 'bold'),
-                           bg=self.colors['secondary'], fg='white',
-                           relief='flat', padx=18, pady=10, borderwidth=0,
-                           activebackground=self.colors['secondary_dark'],
-                           command=self.load_sweatbox_file)
+        load_btn = tk.Button(
+            actions_frame, 
+            text="📁 LOAD FILE",
+            font=button_font,
+            bg=self.colors['primary'], 
+            fg='white',
+            relief='flat', 
+            padx=18, 
+            pady=10, 
+            borderwidth=0,
+            highlightthickness=0,
+            activebackground=self.colors['primary_dark'],
+            command=self.load_sweatbox_file
+        )
         load_btn.pack(side=tk.LEFT, padx=3)
 
-        help_btn = tk.Button(actions_frame, text="❓ HELP & TIPS",
-                           font=('Segoe UI', 9, 'bold'),
-                           bg=self.colors['info'], fg='white',
-                           relief='flat', padx=18, pady=10, borderwidth=0,
-                           activebackground='#81d4fa',
-                           command=self.show_help)
+        help_btn = tk.Button(
+            actions_frame, 
+            text="❓ HELP & TIPS",
+            font=button_font,
+            bg=self.colors['info'], 
+            fg='white',
+            relief='flat', 
+            padx=18, 
+            pady=10, 
+            borderwidth=0,
+            highlightthickness=0,
+            activebackground='#81d4fa',
+            command=self.show_help
+        )
         help_btn.pack(side=tk.LEFT, padx=3)
 
     def setup_status_bar(self):
         """Create modern status bar at bottom"""
-        status_frame = tk.Frame(self.main_container, bg='#34495e', height=35)
+        status_frame = tk.Frame(
+            self.main_container, 
+            bg=self.colors['status_background'], 
+            height=35,
+            highlightthickness=0,
+            relief='flat'
+        )
         status_frame.pack(fill=tk.X, side=tk.BOTTOM)
         status_frame.pack_propagate(False)
 
         # Status indicator
-        status_indicator = tk.Frame(status_frame, bg='#27ae60', width=8, height=8)
+        status_indicator = tk.Frame(
+            status_frame, 
+            bg=self.colors['status_indicator'], 
+            width=8, 
+            height=8,
+            highlightthickness=0,
+            relief='flat'
+        )
         status_indicator.pack(side=tk.LEFT, padx=15, pady=13)
         status_indicator.pack_propagate(False)
 
         # Status text
-        self.status_label = tk.Label(status_frame, text="Ready - Load SCT/ESE files to begin",
-                                   font=('Segoe UI', 9),
-                                   fg='#ecf0f1', bg='#34495e')
+        self.status_label = tk.Label(
+            status_frame, 
+            text="Ready - Load SCT/ESE files to begin",
+            font=(self.font_name, 9),
+            fg=self.colors['status_text'], 
+            bg=self.colors['status_background'],
+            highlightthickness=0,
+            relief='flat'
+        )
         self.status_label.pack(side=tk.LEFT, pady=8)
 
         # Chat button in status bar
-        chat_btn = tk.Button(status_frame, text="💬 CHAT",
-                           font=('Segoe UI', 8, 'bold'),
-                           bg='#03dac6', fg='white',
-                           relief='flat', padx=8, pady=4, borderwidth=0,
-                           activebackground='#00bfa5',
-                           command=self.open_chat)
+        chat_btn = tk.Button(
+            status_frame, 
+            text="💬 CHAT",
+            font=(self.font_name, 8, 'bold'),
+            bg=self.colors['info'], 
+            fg='white',
+            relief='flat', 
+            padx=8, 
+            pady=4, 
+            borderwidth=0,
+            highlightthickness=0,
+            activebackground='#00bfa5',
+            command=self.open_chat
+        )
         chat_btn.pack(side=tk.RIGHT, padx=5, pady=6)
 
         # Progress info
-        self.progress_label = tk.Label(status_frame, text="",
-                                     font=('Segoe UI', 9),
-                                     fg='#bdc3c7', bg='#34495e')
+        self.progress_label = tk.Label(
+            status_frame, 
+            text="",
+            font=(self.font_name, 9),
+            fg='#bdc3c7', 
+            bg=self.colors['status_background'],
+            highlightthickness=0,
+            relief='flat'
+        )
         self.progress_label.pack(side=tk.RIGHT, padx=15, pady=8)
     
     def setup_left_panel(self, parent):
-        # Spectacular gradient background for left panel
+        """Setup left panel with platform-compatible styling"""
+        # Gradient background for left panel
         gradient_canvas = tk.Canvas(parent, height=8, highlightthickness=0)
         gradient_canvas.pack(fill=tk.X, side=tk.TOP)
         gradient_canvas.create_rectangle(0, 0, 1000, 8, fill=self.colors['gradient_start'], outline='')
         gradient_canvas.create_rectangle(0, 4, 1000, 8, fill=self.colors['gradient_end'], outline='')
 
-        # File controls with spectacular styling
-        file_frame = tk.LabelFrame(parent, text="📁 FILE CONTROLS", padx=15, pady=12,
-                                 bg='#ffffff', fg=self.colors['text'], font=('Segoe UI', 11, 'bold'),
-                                 relief='solid', borderwidth=2)
+        # Define fonts
+        frame_font = (self.font_name, 11, 'bold')
+        button_font = (self.font_name, 9, 'bold')
+        label_font = (self.font_name, 9, 'bold')
+        entry_font = (self.font_name, 9)
+        
+        # File controls frame
+        file_frame = tk.LabelFrame(
+            parent, 
+            text="📁 FILE CONTROLS", 
+            padx=15, 
+            pady=12,
+            bg=self.colors['surface'], 
+            fg=self.colors['text'], 
+            font=frame_font,
+            relief='solid', 
+            borderwidth=2,
+            highlightthickness=0
+        )
         file_frame.pack(fill=tk.X, padx=12, pady=8)
 
-        # Spectacular gradient buttons
-        ese_btn = tk.Button(file_frame, text="📡 LOAD ESE FILE", command=self.load_ese_file,
-                          bg=self.colors['secondary'], fg='white', font=('Segoe UI', 9, 'bold'),
-                          relief='flat', borderwidth=0, padx=12, pady=8,
-                          activebackground=self.colors['secondary_dark'])
+        # File control buttons
+        ese_btn = tk.Button(
+            file_frame, 
+            text="📡 LOAD ESE FILE", 
+            command=self.load_ese_file,
+            bg=self.colors['primary'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground=self.colors['primary_dark']
+        )
         ese_btn.pack(fill=tk.X, pady=4)
 
-        sct_btn = tk.Button(file_frame, text="🗺️ LOAD SCT FILE", command=self.load_sct_file,
-                          bg=self.colors['success'], fg='white', font=('Segoe UI', 9, 'bold'),
-                          relief='flat', borderwidth=0, padx=12, pady=8,
-                          activebackground=self.colors['success_dark'])
+        sct_btn = tk.Button(
+            file_frame, 
+            text="🗺️ LOAD SCT FILE", 
+            command=self.load_sct_file,
+            bg=self.colors['success'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground=self.colors['success_dark']
+        )
         sct_btn.pack(fill=tk.X, pady=4)
 
-        load_btn = tk.Button(file_frame, text="📂 LOAD SWEATBOX FILE", command=self.load_sweatbox_file,
-                           bg=self.colors['info'], fg='white', font=('Segoe UI', 9, 'bold'),
-                           relief='flat', borderwidth=0, padx=12, pady=8,
-                           activebackground='#81d4fa')
+        load_btn = tk.Button(
+            file_frame, 
+            text="📂 LOAD SWEATBOX FILE", 
+            command=self.load_sweatbox_file,
+            bg=self.colors['info'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground='#81d4fa'
+        )
         load_btn.pack(fill=tk.X, pady=4)
 
-        create_btn = tk.Button(file_frame, text="⚡ CREATE SWEATBOX", command=self.create_sweatbox,
-                             bg=self.colors['warning'], fg='white', font=('Segoe UI', 9, 'bold'),
-                             relief='flat', borderwidth=0, padx=12, pady=8,
-                             activebackground='#ff8f00')
+        create_btn = tk.Button(
+            file_frame, 
+            text="⚡ CREATE SWEATBOX", 
+            command=self.create_sweatbox,
+            bg=self.colors['warning'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground='#ff8f00'
+        )
         create_btn.pack(fill=tk.X, pady=4)
 
-        # Master controller input with spectacular styling
-        tk.Label(file_frame, text="🎯 Master Controller:", bg='#ffffff', fg=self.colors['text'],
-                font=('Segoe UI', 9, 'bold')).pack(anchor=tk.W, pady=(12, 4))
-        self.master_controller_entry = tk.Entry(file_frame, font=('Segoe UI', 9),
-                                              relief='flat', borderwidth=1, bg='#f8f9fa')
+        # Master controller input
+        tk.Label(
+            file_frame, 
+            text="🎯 Master Controller:", 
+            bg=self.colors['surface'], 
+            fg=self.colors['text'],
+            font=label_font,
+            highlightthickness=0,
+            relief='flat'
+        ).pack(anchor=tk.W, pady=(12, 4))
+        
+        self.master_controller_entry = tk.Entry(
+            file_frame, 
+            font=entry_font,
+            relief='flat', 
+            borderwidth=1, 
+            bg='#f8f9fa',
+            highlightthickness=0
+        )
         self.master_controller_entry.pack(fill=tk.X, pady=2)
         self.master_controller_entry.insert(0, "SYS")
 
-        # Export button with spectacular styling
-        export_btn = tk.Button(file_frame, text="💾 EXPORT SWEATBOX", command=self.export_sweatbox,
-                             bg=self.colors['primary'], fg='white', font=('Segoe UI', 9, 'bold'),
-                             relief='flat', borderwidth=0, padx=12, pady=8,
-                             activebackground=self.colors['primary_dark'])
+        # Export button
+        export_btn = tk.Button(
+            file_frame, 
+            text="💾 EXPORT SWEATBOX", 
+            command=self.export_sweatbox,
+            bg=self.colors['primary'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground=self.colors['primary_dark']
+        )
         export_btn.pack(fill=tk.X, pady=(12, 4))
 
-
-
         # Refresh map button
-        refresh_btn = tk.Button(file_frame, text="🔄 REFRESH MAP", command=self.refresh_map,
-                              bg=self.colors['accent'], fg='white', font=('Segoe UI', 9, 'bold'),
-                              relief='flat', borderwidth=0, padx=12, pady=8,
-                              activebackground='#e91e63')
+        refresh_btn = tk.Button(
+            file_frame, 
+            text="🔄 REFRESH MAP", 
+            command=self.refresh_map,
+            bg=self.colors['accent'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground='#e91e63'
+        )
         refresh_btn.pack(fill=tk.X, pady=4)
 
         # Web map toggle button
-        web_map_btn = tk.Button(file_frame, text="🌐 TOGGLE WEB MAP", command=self.toggle_web_map,
-                              bg=self.colors['info'], fg='white', font=('Segoe UI', 9, 'bold'),
-                              relief='flat', borderwidth=0, padx=12, pady=8,
-                              activebackground='#81d4fa')
+        web_map_btn = tk.Button(
+            file_frame, 
+            text="🌐 TOGGLE WEB MAP", 
+            command=self.toggle_web_map,
+            bg=self.colors['info'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground='#81d4fa'
+        )
         web_map_btn.pack(fill=tk.X, pady=4)
 
-        # Scenario generation with spectacular styling
-        scenario_frame = tk.LabelFrame(parent, text="✈️ SCENARIO GENERATION", padx=15, pady=12,
-                                     bg='#ffffff', fg=self.colors['text'], font=('Segoe UI', 11, 'bold'),
-                                     relief='solid', borderwidth=2)
+        # Scenario generation frame
+        scenario_frame = tk.LabelFrame(
+            parent, 
+            text="✈️ SCENARIO GENERATION", 
+            padx=15, 
+            pady=12,
+            bg=self.colors['surface'], 
+            fg=self.colors['text'], 
+            font=frame_font,
+            relief='solid', 
+            borderwidth=2,
+            highlightthickness=0
+        )
         scenario_frame.pack(fill=tk.X, padx=12, pady=8)
 
-        random_btn = tk.Button(scenario_frame, text="🎲 GENERATE RANDOM SCENARIO",
-                             command=self.generate_random_scenario,
-                             bg=self.colors['success'], fg='white', font=('Segoe UI', 9, 'bold'),
-                             relief='flat', borderwidth=0, padx=12, pady=8,
-                             activebackground=self.colors['success_dark'])
+        random_btn = tk.Button(
+            scenario_frame, 
+            text="🎲 GENERATE RANDOM SCENARIO",
+            command=self.generate_random_scenario,
+            bg=self.colors['success'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground=self.colors['success_dark']
+        )
         random_btn.pack(fill=tk.X, pady=4)
 
-        entry_btn = tk.Button(scenario_frame, text="📍 GENERATE AT ENTRY FIXES",
-                            command=self.generate_aircraft_at_entry,
-                            bg=self.colors['info'], fg='white', font=('Segoe UI', 9, 'bold'),
-                            relief='flat', borderwidth=0, padx=12, pady=8,
-                            activebackground='#81d4fa')
+        entry_btn = tk.Button(
+            scenario_frame, 
+            text="📍 GENERATE AT ENTRY FIXES",
+            command=self.generate_aircraft_at_entry,
+            bg=self.colors['info'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground='#81d4fa'
+        )
         entry_btn.pack(fill=tk.X, pady=4)
 
-        clear_btn = tk.Button(scenario_frame, text="🗑️ CLEAR ALL AIRCRAFT",
-                            command=self.clear_all_aircraft,
-                            bg=self.colors['danger'], fg='white', font=('Segoe UI', 9, 'bold'),
-                            relief='flat', borderwidth=0, padx=12, pady=8,
-                            activebackground='#d32f2f')
+        clear_btn = tk.Button(
+            scenario_frame, 
+            text="🗑️ CLEAR ALL AIRCRAFT",
+            command=self.clear_all_aircraft,
+            bg=self.colors['danger'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground='#d32f2f'
+        )
         clear_btn.pack(fill=tk.X, pady=4)
 
-
-
-        # Aircraft management section with spectacular styling
-        aircraft_frame = tk.LabelFrame(parent, text="⚙️ AIRCRAFT MANAGEMENT", padx=15, pady=12,
-                                     bg='#ffffff', fg=self.colors['text'], font=('Segoe UI', 11, 'bold'),
-                                     relief='solid', borderwidth=2)
+        # Aircraft management frame
+        aircraft_frame = tk.LabelFrame(
+            parent, 
+            text="⚙️ AIRCRAFT MANAGEMENT", 
+            padx=15, 
+            pady=12,
+            bg=self.colors['surface'], 
+            fg=self.colors['text'], 
+            font=frame_font,
+            relief='solid', 
+            borderwidth=2,
+            highlightthickness=0
+        )
         aircraft_frame.pack(fill=tk.X, padx=12, pady=8)
 
-        add_btn = tk.Button(aircraft_frame, text="➕ ADD AIRCRAFT",
-                          command=self.add_aircraft,
-                          bg=self.colors['primary'], fg='white', font=('Segoe UI', 9, 'bold'),
-                          relief='flat', borderwidth=0, padx=12, pady=8,
-                          activebackground=self.colors['primary_dark'])
+        add_btn = tk.Button(
+            aircraft_frame, 
+            text="➕ ADD AIRCRAFT",
+            command=self.add_aircraft,
+            bg=self.colors['primary'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground=self.colors['primary_dark']
+        )
         add_btn.pack(fill=tk.X, pady=4)
 
-        edit_btn = tk.Button(aircraft_frame, text="✏️ EDIT SELECTED",
-                           command=self.edit_aircraft,
-                           bg=self.colors['secondary'], fg='white', font=('Segoe UI', 9, 'bold'),
-                           relief='flat', borderwidth=0, padx=12, pady=8,
-                           activebackground=self.colors['secondary_dark'])
+        edit_btn = tk.Button(
+            aircraft_frame, 
+            text="✏️ EDIT SELECTED",
+            command=self.edit_aircraft,
+            bg=self.colors['primary'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground=self.colors['primary_dark']
+        )
         edit_btn.pack(fill=tk.X, pady=4)
 
-        delete_btn = tk.Button(aircraft_frame, text="🗑️ DELETE SELECTED",
-                             command=self.delete_aircraft,
-                             bg=self.colors['danger'], fg='white', font=('Segoe UI', 9, 'bold'),
-                             relief='flat', borderwidth=0, padx=12, pady=8,
-                             activebackground='#d32f2f')
+        delete_btn = tk.Button(
+            aircraft_frame, 
+            text="🗑️ DELETE SELECTED",
+            command=self.delete_aircraft,
+            bg=self.colors['danger'], 
+            fg='white', 
+            font=button_font,
+            relief='flat', 
+            borderwidth=0,
+            highlightthickness=0,
+            padx=12, 
+            pady=8,
+            activebackground='#d32f2f'
+        )
         delete_btn.pack(fill=tk.X, pady=4)
 
-        # Professional status label
-        self.status_label = tk.Label(parent, text="Ready - Load SCT/ESE files to begin",
-                                   bg=self.colors['surface'], fg=self.colors['text'],
-                                   font=('Segoe UI', 9, 'bold'), anchor='w')
+        # Status label
+        self.status_label = tk.Label(
+            parent, 
+            text="Ready - Load SCT/ESE files to begin",
+            bg=self.colors['surface'], 
+            fg=self.colors['text'],
+            font=label_font, 
+            anchor='w',
+            highlightthickness=0,
+            relief='flat'
+        )
         self.status_label.pack(fill=tk.X, side=tk.BOTTOM, padx=12, pady=8)
     
     def setup_center_panel(self, parent):
@@ -1526,7 +1895,7 @@ class HomePage:
         quick_frame = tk.Frame(notebook)
         notebook.add(quick_frame, text="🚀 Quick Start")
 
-        quick_text = tk.Text(quick_frame, wrap=tk.WORD, padx=10, pady=10, font=('Segoe UI', 10))
+        quick_text = tk.Text(quick_frame, wrap=tk.WORD, padx=10, pady=10, font=(self.font_name, 10))
         quick_text.pack(fill=tk.BOTH, expand=True)
 
         quick_content = """
@@ -1569,7 +1938,7 @@ TIPS:
         features_frame = tk.Frame(notebook)
         notebook.add(features_frame, text="✨ Features")
 
-        features_text = tk.Text(features_frame, wrap=tk.WORD, padx=10, pady=10, font=('Segoe UI', 10))
+        features_text = tk.Text(features_frame, wrap=tk.WORD, padx=10, pady=10, font=(self.font_name, 10))
         features_text.pack(fill=tk.BOTH, expand=True)
 
         features_content = """
@@ -1616,7 +1985,7 @@ USER INTERFACE:
         shortcuts_frame = tk.Frame(notebook)
         notebook.add(shortcuts_frame, text="⌨️ Shortcuts")
 
-        shortcuts_text = tk.Text(shortcuts_frame, wrap=tk.WORD, padx=10, pady=10, font=('Segoe UI', 10))
+        shortcuts_text = tk.Text(shortcuts_frame, wrap=tk.WORD, padx=10, pady=10, font=(self.font_name, 10))
         shortcuts_text.pack(fill=tk.BOTH, expand=True)
 
         shortcuts_content = """
@@ -1653,7 +2022,7 @@ MOUSE CONTROLS:
         about_frame = tk.Frame(notebook)
         notebook.add(about_frame, text="ℹ️ About")
 
-        about_text = tk.Text(about_frame, wrap=tk.WORD, padx=10, pady=10, font=('Segoe UI', 10))
+        about_text = tk.Text(about_frame, wrap=tk.WORD, padx=10, pady=10, font=(self.font_name, 10))
         about_text.pack(fill=tk.BOTH, expand=True)
 
         about_content = """
@@ -1694,7 +2063,7 @@ Licensed under MIT License
         # Close button
         close_btn = tk.Button(help_window, text="Close", command=help_window.destroy,
                             bg=self.colors['primary'], fg='white',
-                            font=('Segoe UI', 10, 'bold'), padx=20, pady=8)
+                            font=(self.font_name, 10, 'bold'), padx=20, pady=8)
         close_btn.pack(pady=10)
 
     def test_aircraft_features(self):
@@ -1750,7 +2119,7 @@ Licensed under MIT License
         chat_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         chat_text = tk.Text(chat_frame, wrap=tk.WORD, state=tk.DISABLED,
-                          font=('Segoe UI', 10), bg='#f8f9fa')
+                          font=(self.font_name, 10), bg='#f8f9fa')
         chat_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         scrollbar = tk.Scrollbar(chat_frame, command=chat_text.yview)
@@ -1761,7 +2130,7 @@ Licensed under MIT License
         input_frame = tk.Frame(chat_window, bg='white')
         input_frame.pack(fill=tk.X, padx=10, pady=5)
 
-        input_entry = tk.Entry(input_frame, font=('Segoe UI', 10))
+        input_entry = tk.Entry(input_frame, font=(self.font_name, 10))
         input_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
 
         def send_message():
@@ -1800,7 +2169,7 @@ Licensed under MIT License
 
         send_btn = tk.Button(input_frame, text="Send", command=send_message,
                            bg=self.colors['primary'], fg='white',
-                           font=('Segoe UI', 9, 'bold'), padx=15)
+                           font=(self.font_name, 9, 'bold'), padx=15)
         send_btn.pack(side=tk.RIGHT)
 
         # Bind Enter key to send

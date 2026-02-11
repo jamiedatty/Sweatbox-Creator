@@ -1,19 +1,24 @@
+#!/usr/bin/env python3
+"""
+Splash Page for Sweatbox Creator
+"""
+
 import tkinter as tk
 from tkinter import ttk
 
 class SplashPage:
     def __init__(self, parent, on_controller_selected):
         self.parent = parent
-        self.on_controller_selected = on_controller_selected  # Callback to handle selection
-
+        self.on_controller_selected = on_controller_selected
+        
         self.setup_ui()
 
     def setup_ui(self):
-        # Main container
+        # Main container with colorful background
         self.main_container = tk.Frame(self.parent, bg='#e3f2fd')
         self.main_container.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
-        # Splash text
+        # Splash text with blue color
         splash_label = tk.Label(
             self.main_container,
             text="✈️ WELCOME TO SWEATBOX CREATOR\n\nProfessional ATC Scenario Builder",
@@ -37,7 +42,7 @@ class SplashPage:
         button_frame = tk.Frame(self.main_container, bg='#e3f2fd')
         button_frame.pack(pady=20)
 
-        # Controller type buttons
+        # Controller type buttons with blue styling
         button_configs = [
             ("GND/DEL", "Ground/Delivery Control"),
             ("TWR", "Tower Control"),
@@ -63,7 +68,7 @@ class SplashPage:
         bottom_frame = tk.Frame(self.main_container, bg='#e3f2fd')
         bottom_frame.pack(side=tk.BOTTOM, pady=20)
 
-        # Chat button
+        # Chat button with teal color
         chat_btn = tk.Button(
             bottom_frame,
             text="💬 Support Chat",
@@ -98,19 +103,18 @@ class SplashPage:
         chat_window.grab_set()
 
         # Chat display area
-        chat_frame = tk.Frame(chat_window, bg='white')
+        chat_frame = tk.Frame(chat_window)
         chat_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        chat_text = tk.Text(chat_frame, wrap=tk.WORD, state=tk.DISABLED,
-                          font=('Segoe UI', 10), bg='#f8f9fa')
+        chat_text = tk.Text(chat_frame, wrap=tk.WORD, state=tk.DISABLED, font=('Segoe UI', 10), bg='#f8f9fa')
         chat_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        scrollbar = tk.Scrollbar(chat_frame, command=chat_text.yview)
+        scrollbar = ttk.Scrollbar(chat_frame, command=chat_text.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         chat_text.config(yscrollcommand=scrollbar.set)
 
         # Input area
-        input_frame = tk.Frame(chat_window, bg='white')
+        input_frame = tk.Frame(chat_window)
         input_frame.pack(fill=tk.X, padx=10, pady=5)
 
         input_entry = tk.Entry(input_frame, font=('Segoe UI', 10))
@@ -124,15 +128,12 @@ class SplashPage:
                 chat_text.config(state=tk.DISABLED)
                 chat_text.see(tk.END)
                 input_entry.delete(0, tk.END)
-
-                # Simulate bot response
-                import time
                 chat_window.after(1000, lambda: show_bot_response(message))
 
         def show_bot_response(user_message):
             responses = {
                 "help": "I'm here to help! You can ask me about:\n• Loading SCT/ESE files\n• Aircraft generation\n• Controller setup\n• Exporting scenarios",
-                "sct": "SCT files contain sector data including airports, runways, fixes, and airways. Load them first to see the airspace structure.",
+                "sct": "SCT files contain sector data including airports, fixes, airways, and boundaries. Load them first to see the airspace structure.",
                 "ese": "ESE files contain controller positions and frequencies. They're needed for realistic ATC simulation.",
                 "aircraft": "You can add aircraft manually or generate them randomly. Each aircraft needs a callsign, type, position, and route.",
                 "export": "Once you have aircraft and controllers set up, use 'Export Sweatbox' to save your scenario for ATC simulation.",
@@ -150,12 +151,9 @@ class SplashPage:
             chat_text.config(state=tk.DISABLED)
             chat_text.see(tk.END)
 
-        send_btn = tk.Button(input_frame, text="Send", command=send_message,
-                           bg='#1976d2', fg='white',
-                           font=('Segoe UI', 9, 'bold'), padx=15)
+        send_btn = tk.Button(input_frame, text="Send", command=send_message, bg='#1976d2', fg='white', font=('Segoe UI', 9, 'bold'), padx=15)
         send_btn.pack(side=tk.RIGHT)
 
-        # Bind Enter key to send
         input_entry.bind('<Return>', lambda e: send_message())
 
         # Initial welcome message
