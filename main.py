@@ -1,32 +1,81 @@
+#!/usr/bin/env python3
+"""
+Sweatbox Creator - Main Application
+Loads SCT and ESE files and displays data on an interactive map
+"""
+
 import tkinter as tk
+from pages.splash_page import SplashPage
 from pages.home_page import HomePage
+from pages.under_development_page import UnderDevelopmentPage
+
+class SweatboxCreatorApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("SWEATBOX CREATOR")
+        self.root.geometry("1400x900")
+        self.root.minsize(1200, 800)
+
+        try:
+            self.root.iconbitmap('icon.ico')
+        except:
+            pass
+
+        # Test for tkintermapview
+        try:
+            from tkintermapview import TkinterMapView
+        except ImportError:
+            import tkinter.messagebox as messagebox
+            messagebox.showerror(
+                "Missing Dependency",
+                "tkintermapview is not installed!\n\n"
+                "Please install it using:\n"
+                "pip install tkintermapview"
+            )
+            return
+
+        # Start with splash page
+        self.show_splash_page()
+
+    def show_splash_page(self):
+        # Clear current content
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Show splash page
+        self.splash_page = SplashPage(self.root, self.on_controller_selected)
+
+    def on_controller_selected(self, controller_type):
+        if controller_type == "APP/DEP":
+            self.show_home_page()
+        else:
+            self.show_under_development_page(controller_type)
+
+    def show_home_page(self):
+        # Clear current content
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Show home page
+        self.home_page = HomePage(self.root)
+
+    def show_under_development_page(self, controller_type):
+        # Clear current content
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Show under development page
+        self.under_development_page = UnderDevelopmentPage(
+            self.root,
+            controller_type,
+            self.show_splash_page
+        )
 
 def main():
     root = tk.Tk()
-    root.title("ESE/SCT File Viewer & Sweatbox Creator")
-    root.geometry("1400x900")
-    root.minsize(1200, 800)
-    
-    try:
-        root.iconbitmap('icon.ico')
-    except:
-        pass
-    
-    # Test for tkintermapview
-    try:
-        from tkintermapview import TkinterMapView
-    except ImportError:
-        tk.messagebox.showerror(
-            "Missing Dependency",
-            "tkintermapview is not installed!\n\n"
-            "Please install it using:\n"
-            "pip install tkintermapview"
-        )
-        return
-    
-    app = HomePage(root)
-    
+    app = SweatboxCreatorApp(root)
     root.mainloop()
 
 if __name__ == "__main__":
     main()
+

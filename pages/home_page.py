@@ -111,89 +111,498 @@ class HomePage:
         
         self.setup_ui()
     
+    def setup_styles(self):
+        """Configure spectacular modern styling with gradients and effects"""
+        style = ttk.Style()
+
+        # Spectacular blue-based color palette
+        self.colors = {
+            'primary': '#1976d2',      # Deep blue
+            'primary_dark': '#1565c0', # Darker blue
+            'primary_light': '#42a5f5', # Light blue
+            'secondary': '#2196f3',    # Bright blue
+            'secondary_dark': '#1976d2', # Medium blue
+            'success': '#4caf50',      # Green
+            'success_dark': '#388e3c', # Dark green
+            'warning': '#ff9800',      # Orange
+            'danger': '#f44336',       # Red
+            'info': '#03dac6',         # Teal
+            'dark': '#263238',         # Dark blue-gray
+            'light': '#f5f5f5',        # Light gray
+            'white': '#ffffff',
+            'surface': '#ffffff',      # Card surface
+            'background': '#e3f2fd',   # Very light blue
+            'border': '#bbdefb',       # Light blue border
+            'text': '#0d47a1',         # Dark blue text
+            'text_secondary': '#455a64', # Blue-gray
+            'text_hint': '#78909c',    # Light blue-gray
+            'divider': '#e3f2fd',      # Light blue dividers
+            'shadow': '#00000015',    # Soft shadow
+            'gradient_start': '#1976d2', # Deep blue
+            'gradient_end': '#42a5f5',   # Light blue
+            'accent': '#2196f3',       # Bright blue
+            'highlight': '#64b5f6'     # Medium light blue
+        }
+
+        # Configure modern button styles with proper hover effects
+        style.configure('Action.TButton',
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=[16, 8],
+                       relief='flat',
+                       borderwidth=0,
+                       background=self.colors['primary'],
+                       foreground=self.colors['white'])
+
+        style.configure('Primary.TButton',
+                       background=self.colors['primary'],
+                       foreground=self.colors['white'],
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=[16, 8],
+                       relief='flat',
+                       borderwidth=0)
+
+        style.configure('Success.TButton',
+                       background=self.colors['success'],
+                       foreground=self.colors['white'],
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=[16, 8],
+                       relief='flat',
+                       borderwidth=0)
+
+        style.configure('Warning.TButton',
+                       background=self.colors['warning'],
+                       foreground=self.colors['white'],
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=[16, 8],
+                       relief='flat',
+                       borderwidth=0)
+
+        style.configure('Danger.TButton',
+                       background=self.colors['danger'],
+                       foreground=self.colors['white'],
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=[16, 8],
+                       relief='flat',
+                       borderwidth=0)
+
+        style.configure('Secondary.TButton',
+                       background=self.colors['secondary'],
+                       foreground=self.colors['white'],
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=[16, 8],
+                       relief='flat',
+                       borderwidth=0)
+
+        style.configure('Outline.TButton',
+                       background=self.colors['white'],
+                       foreground=self.colors['primary'],
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=[14, 6],
+                       relief='solid',
+                       borderwidth=2,
+                       bordercolor=self.colors['primary'])
+
+        # Configure modern card frames
+        style.configure('Card.TLabelframe',
+                       background=self.colors['surface'],
+                       borderwidth=1,
+                       relief='solid',
+                       bordercolor=self.colors['border'])
+
+        style.configure('Card.TLabelframe.Label',
+                       background=self.colors['surface'],
+                       foreground=self.colors['text'],
+                       font=('Segoe UI', 12, 'bold'))
+
+        # Configure modern treeview with alternating rows
+        style.configure('Modern.Treeview',
+                       font=('Segoe UI', 9),
+                       rowheight=32,
+                       background=self.colors['surface'],
+                       fieldbackground=self.colors['surface'],
+                       borderwidth=0,
+                       relief='flat')
+
+        style.configure('Modern.Treeview.Heading',
+                       font=('Segoe UI', 10, 'bold'),
+                       background=self.colors['light'],
+                       foreground=self.colors['text'],
+                       borderwidth=0,
+                       relief='flat')
+
+        # Configure modern notebook with tabs
+        style.configure('Modern.TNotebook',
+                       background=self.colors['background'],
+                       borderwidth=0,
+                       relief='flat')
+
+        style.configure('Modern.TNotebook.Tab',
+                       background=self.colors['light'],
+                       foreground=self.colors['text_secondary'],
+                       font=('Segoe UI', 10, 'bold'),
+                       padding=[24, 12],
+                       borderwidth=0,
+                       relief='flat')
+
+        style.map('Modern.TNotebook.Tab',
+                 background=[('selected', self.colors['surface'])],
+                 foreground=[('selected', self.colors['primary'])])
+
+        # Configure modern entry fields
+        style.configure('Modern.TEntry',
+                       font=('Segoe UI', 10),
+                       padding=10,
+                       relief='flat',
+                       borderwidth=1,
+                       bordercolor=self.colors['border'],
+                       fieldbackground=self.colors['surface'])
+
+        # Configure modern labels
+        style.configure('Modern.TLabel',
+                       font=('Segoe UI', 10),
+                       background=self.colors['surface'],
+                       foreground=self.colors['text'])
+
+        style.configure('Header.TLabel',
+                       font=('Segoe UI', 16, 'bold'),
+                       background=self.colors['surface'],
+                       foreground=self.colors['text'])
+
+        style.configure('Subheader.TLabel',
+                       font=('Segoe UI', 12, 'bold'),
+                       background=self.colors['surface'],
+                       foreground=self.colors['text'])
+
+        style.configure('Caption.TLabel',
+                       font=('Segoe UI', 9),
+                       background=self.colors['surface'],
+                       foreground=self.colors['text_secondary'])
+
+        # Configure modern progress bars
+        style.configure('Modern.Horizontal.TProgressbar',
+                       background=self.colors['primary'],
+                       troughcolor=self.colors['light'],
+                       borderwidth=0,
+                       lightcolor=self.colors['primary'],
+                       darkcolor=self.colors['primary'])
+
     def setup_ui(self):
-        # Main container
-        main_container = tk.PanedWindow(self.parent, orient=tk.HORIZONTAL, sashrelief=tk.RAISED)
-        main_container.pack(fill=tk.BOTH, expand=True)
-        
-        # Left panel - controls
-        left_panel = tk.Frame(main_container, bg='#f0f0f0')
-        main_container.add(left_panel, minsize=300)
-        
-        # Center panel - map
-        center_panel = tk.Frame(main_container, bg='white')
-        main_container.add(center_panel, minsize=600)
-        
-        # Right panel - details
-        right_panel = tk.Frame(main_container, bg='#f0f0f0')
-        main_container.add(right_panel, minsize=300)
-        
+        # Configure modern style
+        self.setup_styles()
+
+        # Main container with spectacular gradient background
+        self.main_container = tk.Frame(self.parent, bg=self.colors['background'])
+        self.main_container.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
+
+        # Top header bar
+        self.setup_header_bar()
+
+        # Main content area with gradient background
+        content_frame = tk.Frame(self.main_container, bg=self.colors['background'])
+        content_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=15)
+
+        # Main paned window for three-panel layout with spectacular styling
+        main_paned = tk.PanedWindow(content_frame, orient=tk.HORIZONTAL,
+                                   sashrelief=tk.FLAT, sashwidth=8,
+                                   bg=self.colors['divider'])
+        main_paned.pack(fill=tk.BOTH, expand=True)
+
+        # Left panel - controls (spectacular gradient sidebar)
+        left_panel = tk.Frame(main_paned, bg=self.colors['surface'], relief='raised', borderwidth=2)
+        main_paned.add(left_panel, minsize=360)
+
+        # Center panel - map (main content area with gradient)
+        center_panel = tk.Frame(main_paned, bg=self.colors['surface'], relief='raised', borderwidth=2)
+        main_paned.add(center_panel, minsize=780)
+
+        # Right panel - details (info panel with gradient)
+        right_panel = tk.Frame(main_paned, bg=self.colors['surface'], relief='raised', borderwidth=2)
+        main_paned.add(right_panel, minsize=360)
+
         self.setup_left_panel(left_panel)
         self.setup_center_panel(center_panel)
         self.setup_right_panel(right_panel)
+
+        # Bottom status bar
+        self.setup_status_bar()
+
+
+
+
+
+    def setup_header_bar(self):
+        """Create spectacular gradient header bar with modern styling"""
+        # Create gradient effect using multiple frames
+        header_frame = tk.Frame(self.main_container, height=70)
+        header_frame.pack(fill=tk.X, side=tk.TOP)
+        header_frame.pack_propagate(False)
+
+        # Gradient background using layered frames
+        gradient_frame1 = tk.Frame(header_frame, bg=self.colors['gradient_start'], height=70)
+        gradient_frame1.pack(fill=tk.X)
+        gradient_frame1.pack_propagate(False)
+
+        gradient_frame2 = tk.Frame(gradient_frame1, bg=self.colors['gradient_end'], height=70)
+        gradient_frame2.pack(fill=tk.X, padx=2, pady=2)
+        gradient_frame2.pack_propagate(False)
+
+        # Logo/title area with spectacular styling
+        title_frame = tk.Frame(gradient_frame2, bg=self.colors['gradient_end'])
+        title_frame.pack(side=tk.LEFT, padx=25, pady=12)
+
+        # Spectacular title with gradient effect simulation
+        title_label = tk.Label(title_frame, text="✈️ SWEATBOX CREATOR",
+                              font=('Segoe UI', 20, 'bold'),
+                              fg='#ffffff', bg=self.colors['gradient_end'])
+        title_label.pack(side=tk.TOP, anchor=tk.W)
+
+        subtitle_label = tk.Label(title_frame, text="✨ Professional ATC Scenario Builder ✨",
+                                 font=('Segoe UI', 10, 'bold'),
+                                 fg='#e8f4f8', bg=self.colors['gradient_end'])
+        subtitle_label.pack(side=tk.TOP, anchor=tk.W, pady=(2, 0))
+
+        # Quick actions area with spectacular buttons
+        actions_frame = tk.Frame(gradient_frame2, bg=self.colors['gradient_end'])
+        actions_frame.pack(side=tk.RIGHT, padx=25, pady=12)
+
+        # Spectacular gradient buttons
+        save_btn = tk.Button(actions_frame, text="💾 SAVE SCENARIO",
+                           font=('Segoe UI', 9, 'bold'),
+                           bg=self.colors['success'], fg='white',
+                           relief='flat', padx=18, pady=10, borderwidth=0,
+                           activebackground=self.colors['success_dark'],
+                           command=self.export_sweatbox)
+        save_btn.pack(side=tk.LEFT, padx=3)
+
+        load_btn = tk.Button(actions_frame, text="📁 LOAD FILE",
+                           font=('Segoe UI', 9, 'bold'),
+                           bg=self.colors['secondary'], fg='white',
+                           relief='flat', padx=18, pady=10, borderwidth=0,
+                           activebackground=self.colors['secondary_dark'],
+                           command=self.load_sweatbox_file)
+        load_btn.pack(side=tk.LEFT, padx=3)
+
+        help_btn = tk.Button(actions_frame, text="❓ HELP & TIPS",
+                           font=('Segoe UI', 9, 'bold'),
+                           bg=self.colors['info'], fg='white',
+                           relief='flat', padx=18, pady=10, borderwidth=0,
+                           activebackground='#81d4fa',
+                           command=self.show_help)
+        help_btn.pack(side=tk.LEFT, padx=3)
+
+    def setup_status_bar(self):
+        """Create modern status bar at bottom"""
+        status_frame = tk.Frame(self.main_container, bg='#34495e', height=35)
+        status_frame.pack(fill=tk.X, side=tk.BOTTOM)
+        status_frame.pack_propagate(False)
+
+        # Status indicator
+        status_indicator = tk.Frame(status_frame, bg='#27ae60', width=8, height=8)
+        status_indicator.pack(side=tk.LEFT, padx=15, pady=13)
+        status_indicator.pack_propagate(False)
+
+        # Status text
+        self.status_label = tk.Label(status_frame, text="Ready - Load SCT/ESE files to begin",
+                                   font=('Segoe UI', 9),
+                                   fg='#ecf0f1', bg='#34495e')
+        self.status_label.pack(side=tk.LEFT, pady=8)
+
+        # Chat button in status bar
+        chat_btn = tk.Button(status_frame, text="💬 CHAT",
+                           font=('Segoe UI', 8, 'bold'),
+                           bg='#03dac6', fg='white',
+                           relief='flat', padx=8, pady=4, borderwidth=0,
+                           activebackground='#00bfa5',
+                           command=self.open_chat)
+        chat_btn.pack(side=tk.RIGHT, padx=5, pady=6)
+
+        # Progress info
+        self.progress_label = tk.Label(status_frame, text="",
+                                     font=('Segoe UI', 9),
+                                     fg='#bdc3c7', bg='#34495e')
+        self.progress_label.pack(side=tk.RIGHT, padx=15, pady=8)
     
     def setup_left_panel(self, parent):
-        # File controls
-        file_frame = tk.LabelFrame(parent, text="File Controls", padx=10, pady=10)
-        file_frame.pack(fill=tk.X, padx=10, pady=10)
-        
-        # ESE file button
-        tk.Button(file_frame, text="Load ESE File", command=self.load_ese_file,
-                 bg='#3498db', fg='white').pack(fill=tk.X, pady=5)
-        
-        # SCT file button
-        tk.Button(file_frame, text="Load SCT File", command=self.load_sct_file,
-                 bg='#2ecc71', fg='white').pack(fill=tk.X, pady=5)
-        
-        # RWY file button
-        tk.Button(file_frame, text="Load RWY File", command=self.load_rwy_file,
-                 bg='#e74c3c', fg='white').pack(fill=tk.X, pady=5)
-        
-        # Master controller input
-        tk.Label(file_frame, text="Master Controller:").pack(anchor=tk.W, pady=(10, 0))
-        self.master_controller_entry = tk.Entry(file_frame)
-        self.master_controller_entry.pack(fill=tk.X, pady=5)
+        # Spectacular gradient background for left panel
+        gradient_canvas = tk.Canvas(parent, height=8, highlightthickness=0)
+        gradient_canvas.pack(fill=tk.X, side=tk.TOP)
+        gradient_canvas.create_rectangle(0, 0, 1000, 8, fill=self.colors['gradient_start'], outline='')
+        gradient_canvas.create_rectangle(0, 4, 1000, 8, fill=self.colors['gradient_end'], outline='')
+
+        # File controls with spectacular styling
+        file_frame = tk.LabelFrame(parent, text="📁 FILE CONTROLS", padx=15, pady=12,
+                                 bg='#ffffff', fg=self.colors['text'], font=('Segoe UI', 11, 'bold'),
+                                 relief='solid', borderwidth=2)
+        file_frame.pack(fill=tk.X, padx=12, pady=8)
+
+        # Spectacular gradient buttons
+        ese_btn = tk.Button(file_frame, text="📡 LOAD ESE FILE", command=self.load_ese_file,
+                          bg=self.colors['secondary'], fg='white', font=('Segoe UI', 9, 'bold'),
+                          relief='flat', borderwidth=0, padx=12, pady=8,
+                          activebackground=self.colors['secondary_dark'])
+        ese_btn.pack(fill=tk.X, pady=4)
+
+        sct_btn = tk.Button(file_frame, text="🗺️ LOAD SCT FILE", command=self.load_sct_file,
+                          bg=self.colors['success'], fg='white', font=('Segoe UI', 9, 'bold'),
+                          relief='flat', borderwidth=0, padx=12, pady=8,
+                          activebackground=self.colors['success_dark'])
+        sct_btn.pack(fill=tk.X, pady=4)
+
+        load_btn = tk.Button(file_frame, text="📂 LOAD SWEATBOX FILE", command=self.load_sweatbox_file,
+                           bg=self.colors['info'], fg='white', font=('Segoe UI', 9, 'bold'),
+                           relief='flat', borderwidth=0, padx=12, pady=8,
+                           activebackground='#81d4fa')
+        load_btn.pack(fill=tk.X, pady=4)
+
+        create_btn = tk.Button(file_frame, text="⚡ CREATE SWEATBOX", command=self.create_sweatbox,
+                             bg=self.colors['warning'], fg='white', font=('Segoe UI', 9, 'bold'),
+                             relief='flat', borderwidth=0, padx=12, pady=8,
+                             activebackground='#ff8f00')
+        create_btn.pack(fill=tk.X, pady=4)
+
+        # Master controller input with spectacular styling
+        tk.Label(file_frame, text="🎯 Master Controller:", bg='#ffffff', fg=self.colors['text'],
+                font=('Segoe UI', 9, 'bold')).pack(anchor=tk.W, pady=(12, 4))
+        self.master_controller_entry = tk.Entry(file_frame, font=('Segoe UI', 9),
+                                              relief='flat', borderwidth=1, bg='#f8f9fa')
+        self.master_controller_entry.pack(fill=tk.X, pady=2)
         self.master_controller_entry.insert(0, "SYS")
-        
-        # Export button
-        tk.Button(file_frame, text="Export Sweatbox", command=self.export_sweatbox, 
-                 bg='#9b59b6', fg='white').pack(fill=tk.X, pady=(10, 5))
-        
+
+        # Export button with spectacular styling
+        export_btn = tk.Button(file_frame, text="💾 EXPORT SWEATBOX", command=self.export_sweatbox,
+                             bg=self.colors['primary'], fg='white', font=('Segoe UI', 9, 'bold'),
+                             relief='flat', borderwidth=0, padx=12, pady=8,
+                             activebackground=self.colors['primary_dark'])
+        export_btn.pack(fill=tk.X, pady=(12, 4))
+
+
+
         # Refresh map button
-        tk.Button(file_frame, text="Refresh Map", command=self.refresh_map,
-                 bg='#f39c12', fg='white').pack(fill=tk.X, pady=5)
-        
-        # Scenario generation
-        scenario_frame = tk.LabelFrame(parent, text="Scenario Generation", padx=10, pady=10)
-        scenario_frame.pack(fill=tk.X, padx=10, pady=10)
-        
-        tk.Button(scenario_frame, text="Generate Random Scenario", 
-                 command=self.generate_random_scenario,
-                 bg='#1abc9c', fg='white').pack(fill=tk.X, pady=5)
-        
-        tk.Button(scenario_frame, text="Generate Aircraft at Entry Fixes", 
-                 command=self.generate_aircraft_at_entry,
-                 bg='#16a085', fg='white').pack(fill=tk.X, pady=5)
-        
-        tk.Button(scenario_frame, text="Clear All Aircraft", 
-                 command=self.clear_all_aircraft,
-                 bg='#c0392b', fg='white').pack(fill=tk.X, pady=5)
-        
-        # Test button (temporary)
-        test_frame = tk.LabelFrame(parent, text="Debug", padx=10, pady=10)
-        test_frame.pack(fill=tk.X, padx=10, pady=10)
-        
-        tk.Button(test_frame, text="Test Aircraft Features", 
-                 command=self.test_aircraft_features,
-                 bg='#ff9900', fg='white').pack(fill=tk.X, pady=5)
-        
-        # Status label
-        self.status_label = tk.Label(parent, text="Ready", bg='#f0f0f0', fg='#666666')
-        self.status_label.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=10)
+        refresh_btn = tk.Button(file_frame, text="🔄 REFRESH MAP", command=self.refresh_map,
+                              bg=self.colors['accent'], fg='white', font=('Segoe UI', 9, 'bold'),
+                              relief='flat', borderwidth=0, padx=12, pady=8,
+                              activebackground='#e91e63')
+        refresh_btn.pack(fill=tk.X, pady=4)
+
+        # Web map toggle button
+        web_map_btn = tk.Button(file_frame, text="🌐 TOGGLE WEB MAP", command=self.toggle_web_map,
+                              bg=self.colors['info'], fg='white', font=('Segoe UI', 9, 'bold'),
+                              relief='flat', borderwidth=0, padx=12, pady=8,
+                              activebackground='#81d4fa')
+        web_map_btn.pack(fill=tk.X, pady=4)
+
+        # Scenario generation with spectacular styling
+        scenario_frame = tk.LabelFrame(parent, text="✈️ SCENARIO GENERATION", padx=15, pady=12,
+                                     bg='#ffffff', fg=self.colors['text'], font=('Segoe UI', 11, 'bold'),
+                                     relief='solid', borderwidth=2)
+        scenario_frame.pack(fill=tk.X, padx=12, pady=8)
+
+        random_btn = tk.Button(scenario_frame, text="🎲 GENERATE RANDOM SCENARIO",
+                             command=self.generate_random_scenario,
+                             bg=self.colors['success'], fg='white', font=('Segoe UI', 9, 'bold'),
+                             relief='flat', borderwidth=0, padx=12, pady=8,
+                             activebackground=self.colors['success_dark'])
+        random_btn.pack(fill=tk.X, pady=4)
+
+        entry_btn = tk.Button(scenario_frame, text="📍 GENERATE AT ENTRY FIXES",
+                            command=self.generate_aircraft_at_entry,
+                            bg=self.colors['info'], fg='white', font=('Segoe UI', 9, 'bold'),
+                            relief='flat', borderwidth=0, padx=12, pady=8,
+                            activebackground='#81d4fa')
+        entry_btn.pack(fill=tk.X, pady=4)
+
+        clear_btn = tk.Button(scenario_frame, text="🗑️ CLEAR ALL AIRCRAFT",
+                            command=self.clear_all_aircraft,
+                            bg=self.colors['danger'], fg='white', font=('Segoe UI', 9, 'bold'),
+                            relief='flat', borderwidth=0, padx=12, pady=8,
+                            activebackground='#d32f2f')
+        clear_btn.pack(fill=tk.X, pady=4)
+
+
+
+        # Aircraft management section with spectacular styling
+        aircraft_frame = tk.LabelFrame(parent, text="⚙️ AIRCRAFT MANAGEMENT", padx=15, pady=12,
+                                     bg='#ffffff', fg=self.colors['text'], font=('Segoe UI', 11, 'bold'),
+                                     relief='solid', borderwidth=2)
+        aircraft_frame.pack(fill=tk.X, padx=12, pady=8)
+
+        add_btn = tk.Button(aircraft_frame, text="➕ ADD AIRCRAFT",
+                          command=self.add_aircraft,
+                          bg=self.colors['primary'], fg='white', font=('Segoe UI', 9, 'bold'),
+                          relief='flat', borderwidth=0, padx=12, pady=8,
+                          activebackground=self.colors['primary_dark'])
+        add_btn.pack(fill=tk.X, pady=4)
+
+        edit_btn = tk.Button(aircraft_frame, text="✏️ EDIT SELECTED",
+                           command=self.edit_aircraft,
+                           bg=self.colors['secondary'], fg='white', font=('Segoe UI', 9, 'bold'),
+                           relief='flat', borderwidth=0, padx=12, pady=8,
+                           activebackground=self.colors['secondary_dark'])
+        edit_btn.pack(fill=tk.X, pady=4)
+
+        delete_btn = tk.Button(aircraft_frame, text="🗑️ DELETE SELECTED",
+                             command=self.delete_aircraft,
+                             bg=self.colors['danger'], fg='white', font=('Segoe UI', 9, 'bold'),
+                             relief='flat', borderwidth=0, padx=12, pady=8,
+                             activebackground='#d32f2f')
+        delete_btn.pack(fill=tk.X, pady=4)
+
+        # Professional status label
+        self.status_label = tk.Label(parent, text="Ready - Load SCT/ESE files to begin",
+                                   bg=self.colors['surface'], fg=self.colors['text'],
+                                   font=('Segoe UI', 9, 'bold'), anchor='w')
+        self.status_label.pack(fill=tk.X, side=tk.BOTTOM, padx=12, pady=8)
     
     def setup_center_panel(self, parent):
-        # Initialize map viewer
+        # Store reference to center panel for map recreation
+        self.center_panel = parent
+        # Create initial map viewer (empty, with no data)
         self.map_viewer = self.SweatboxMapViewer(parent, self.ese_parser, self.sct_parser, self.rwy_parser)
+        
+        # Enable verbose debug output
+        try:
+            if hasattr(self.map_viewer, 'debug'):
+                self.map_viewer.debug = True
+        except Exception:
+            pass
+    
+    def recreate_map(self):
+        """Recreate map with current parsers - used when loading new files"""
+        try:
+            # Save current aircraft data and selection before recreating
+            saved_aircraft = self.map_viewer.aircraft_data.copy() if self.map_viewer and hasattr(self.map_viewer, 'aircraft_data') else []
+            saved_selected = self.map_viewer.selected_aircraft if self.map_viewer and hasattr(self.map_viewer, 'selected_aircraft') else None
+            saved_airport = self.map_viewer.selected_airport if self.map_viewer and hasattr(self.map_viewer, 'selected_airport') else None
+            saved_loaded_airports = self.map_viewer.loaded_airports.copy() if self.map_viewer and hasattr(self.map_viewer, 'loaded_airports') else []
+
+            # Destroy ALL child widgets in center_panel to start fresh
+            for widget in list(self.center_panel.winfo_children()):
+                try:
+                    widget.destroy()
+                except Exception as e:
+                    print(f"Error destroying widget: {e}")
+                    try:
+                        widget.pack_forget()
+                    except Exception as e2:
+                        print(f"Error packing forget widget: {e2}")
+
+            # Create new map viewer with updated parser
+            self.map_viewer = self.SweatboxMapViewer(self.center_panel, self.ese_parser,
+                                                     self.sct_parser, self.rwy_parser)
+            if hasattr(self.map_viewer, 'debug'):
+                self.map_viewer.debug = True
+
+            # Restore saved data
+            self.map_viewer.aircraft_data = saved_aircraft
+            self.map_viewer.selected_aircraft = saved_selected
+            self.map_viewer.selected_airport = saved_airport
+            self.map_viewer.loaded_airports = saved_loaded_airports
+
+            print("[RECREATE] ✓ Map recreated with fresh widgets")
+        except Exception as e:
+            print(f"[ERROR] Failed to recreate map: {e}")
+            import traceback
+            traceback.print_exc()
     
     def setup_right_panel(self, parent):
         # Notebook for tabs
@@ -274,6 +683,12 @@ class HomePage:
         
         self.controller_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
         y_scrollbar.pack(side=tk.RIGHT, fill=tk.Y, padx=(0, 5), pady=5)
+
+        # Bind double-click on controller to toggle simulated state
+        try:
+            self.controller_tree.bind('<Double-1>', lambda e: self.toggle_controller_sim())
+        except Exception:
+            pass
         
         # Buttons frame
         btn_frame = tk.Frame(parent)
@@ -311,16 +726,42 @@ class HomePage:
                  command=self.apply_route_to_selected).pack(side=tk.LEFT, padx=5)
     
     def extract_airports_from_controllers(self, positions):
-        """Extract unique airport ICAOs from controller positions (everything before underscore)"""
+        """Extract unique airport ICAOs from controller positions.
+
+        Rules applied:
+        - Skip any controller that ends with FSS or CTR (case-insensitive)
+        - Split callsign on '_' and look for the first 4-letter alphabetic token
+        - Return a sorted list of unique ICAOs
+        
+        Examples:
+        - OMAA_APP -> OMAA (valid)
+        - OMAA_CTR -> skip (CTR is not an airport)
+        - OMAA_FSS -> skip (FSS is not an airport)
+        - OMDB_TWR -> OMDB (valid)
+        """
         airports = set()
         for pos in positions:
-            callsign = pos.get('callsign', '')
-            if '_' in callsign:
-                # Take everything before the first underscore
-                airport = callsign.split('_')[0]
-                # Only add if it looks like an airport code (4 letters)
-                if len(airport) == 4 and airport.isalpha():
-                    airports.add(airport)
+            raw = (pos.get('callsign') or '').strip().upper()
+            if not raw:
+                continue
+
+            # Skip any callsigns that end with FSS or CTR (these are not airports)
+            if raw.endswith('_FSS') or raw.endswith('_CTR'):
+                if self.debug if hasattr(self, 'debug') else False:
+                    print(f"[EXTRACT] Skipping {raw} - ends with FSS or CTR")
+                continue
+
+            parts = [p for p in raw.split('_') if p]
+            if not parts:
+                continue
+            
+            # Extract first token (should be 4-letter ICAO)
+            first_token = parts[0]
+            if len(first_token) == 4 and first_token.isalpha():
+                airports.add(first_token)
+                # Uncomment for debugging:
+                # print(f"[EXTRACT] Valid airport: {first_token} from {raw}")
+
         return sorted(list(airports))
     
     def load_ese_file(self):
@@ -332,10 +773,16 @@ class HomePage:
             try:
                 self.ese_parser = self.ESEParser(file_path)
                 
+                # CRITICAL: Update map viewer with the ESE parser so it can use the fallback logic
+                if self.map_viewer and hasattr(self.map_viewer, 'ese_parser'):
+                    self.map_viewer.ese_parser = self.ese_parser
+                    print(f"[ESE] Updated map viewer with ESE parser")
+                
                 # Extract airports from controller positions
                 positions = []
                 if hasattr(self.ese_parser, 'get_positions'):
                     positions = self.ese_parser.get_positions()
+                    print(f"[ESE] Loaded {len(positions)} controller positions from ESE")
                 
                 # Extract airports (everything before underscore)
                 airports = self.extract_airports_from_controllers(positions)
@@ -343,6 +790,42 @@ class HomePage:
                 # Update map viewer with extracted airports
                 if self.map_viewer and hasattr(self.map_viewer, 'update_airports'):
                     self.map_viewer.update_airports(airports)
+
+                    # Also highlight those airports on the map (look up coordinates from SCT if available)
+                    try:
+                        if hasattr(self.map_viewer, 'highlight_airports'):
+                            # If there is no SCT parser loaded, we cannot resolve ICAOs to coords
+                            if not self.sct_parser:
+                                print("[ESE] No SCT loaded - cannot highlight airports. Load SCT file first to enable highlighting.")
+                                messagebox.showinfo("Notice", "ESE loaded but no SCT data present.\nLoad an SCT file first to highlight airports on the map.")
+                            else:
+                                drawn = self.map_viewer.highlight_airports(airports)
+                                print(f"[ESE] Highlighted {drawn} airports on map")
+                                if drawn == 0:
+                                    # No matching airports from ESE. Try displaying all SCT airports instead.
+                                    print(f"[ESE] No matching airports found for extracted: {', '.join(airports)}")
+                                    try:
+                                        sct_data = self.sct_parser.get_data()
+                                        sct_airports = [a.get('icao') for a in sct_data.get('airports', []) if a.get('icao')]
+                                        if sct_airports:
+                                            print(f"[ESE] Falling back to displaying SCT airports: {sct_airports}")
+                                            # Highlight SCT airports instead
+                                            drawn_sct = self.map_viewer.highlight_airports(sct_airports)
+                                            print(f"[ESE] Highlighted {drawn_sct} SCT airports on map")
+                                            messagebox.showinfo("Note", 
+                                                f"ESE controllers did not match SCT airports.\n"
+                                                f"Displaying SCT airports instead: {', '.join(sct_airports)}\n\n"
+                                                f"ESE extracted: {', '.join(airports[:5])}{'...' if len(airports) > 5 else ''}")
+                                        else:
+                                            messagebox.showinfo("ESE Notice", 
+                                                f"No airports extracted from ESE.\n"
+                                                f"No airports in SCT either.")
+                                    except Exception as e:
+                                        print(f"[ESE] Error falling back to SCT airports: {e}")
+                                        messagebox.showinfo("ESE Notice", 
+                                            f"No matching airports found in loaded SCT for: {', '.join(airports[:10])}")
+                    except Exception as e:
+                        print(f"[ESE] Error highlighting airports: {e}")
                 
                 # Clear existing controllers
                 if self.controller_tree:
@@ -351,10 +834,11 @@ class HomePage:
                 
                 # Add controllers to tree - DEFAULT TO ✗ (OFF)
                 for pos in positions:
-                    # Skip _FSS and some _CTR positions if needed
-                    if '_FSS' in pos.get('callsign', ''):
+                    callsign = (pos.get('callsign') or '').strip().upper()
+                    # Skip FSS and CTR types entirely from the list
+                    if 'FSS' in callsign or callsign.endswith('_CTR') or '_CTR' in callsign:
                         continue
-                    
+
                     self.controller_tree.insert('', 'end', values=(
                         pos.get('callsign', ''),
                         pos.get('frequency', ''),
@@ -380,6 +864,7 @@ class HomePage:
         )
         if file_path:
             try:
+                print(f"\n[LOAD] Loading SCT file: {os.path.basename(file_path)}")
                 self.sct_parser = self.SCTParser(file_path)
                 data = self.sct_parser.parse()
                 
@@ -392,8 +877,10 @@ class HomePage:
                 artcc_high_count = len(data.get('ARTCC_HIGH', []))
                 artcc_low_count = len(data.get('ARTCC_LOW', []))
                 
+                print(f"[LOAD] ✓ Parsed: {airports_count} airports, {fixes_count} fixes, {runways_count} runways")
+                
                 messagebox.showinfo("Success", 
-                    f"Loaded SCT file: {file_path}\n"
+                    f"Loaded SCT file: {os.path.basename(file_path)}\n"
                     f"Airports: {airports_count}\n"
                     f"Fixes: {fixes_count}\n"
                     f"Runways: {runways_count}\n"
@@ -403,14 +890,27 @@ class HomePage:
                     f"ARTCC Low: {artcc_low_count} boundaries"
                 )
                 
-                # Update map viewer - LOAD DATA IMMEDIATELY
-                if self.map_viewer:
-                    self.map_viewer.sct_parser = self.sct_parser
-                    self.map_viewer.load_data()  # This should draw data to map
+                # Recreate map with new parser and load data
+                print("[LOAD] Recreating map with new data...")
+                self.recreate_map()
+                self.map_viewer.load_data()
+                print("[LOAD] ✓ Map displayed")
                 
-                self.status_label.config(text=f"Loaded SCT: {os.path.basename(file_path)} - {airports_count} airports, {fixes_count} fixes")
+                # Highlight all SCT airports on the map
+                try:
+                    sct_airports = [a.get('icao') for a in data.get('airports', []) if a.get('icao')]
+                    if sct_airports and hasattr(self.map_viewer, 'highlight_airports'):
+                        drawn = self.map_viewer.highlight_airports(sct_airports)
+                        print(f"[LOAD] ✓ Highlighted {drawn} airports on map")
+                except Exception as e:
+                    print(f"[LOAD] Could not highlight airports: {e}")
+                
+                self.status_label.config(text=f"✓ Loaded {os.path.basename(file_path)}\n{airports_count} airports, {fixes_count} fixes")
                 
             except Exception as e:
+                print(f"[ERROR] {e}")
+                import traceback
+                traceback.print_exc()
                 messagebox.showerror("Error", f"Failed to load SCT file: {str(e)}")
     
     def load_rwy_file(self):
@@ -444,14 +944,190 @@ class HomePage:
                 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load RWY file: {str(e)}")
+
+    def load_sweatbox_file(self):
+        """Load an existing sweatbox-like file and import controllers and aircraft into the UI"""
+        file_path = filedialog.askopenfilename(
+            title="Select Sweatbox File",
+            filetypes=[("Text files", "*.txt;*.sweatbox;*.sbx"), ("All files", "*.*")]
+        )
+        if not file_path:
+            return
+
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                lines = [l.strip() for l in f.readlines()]
+
+            # Clear existing trees
+            for item in self.controller_tree.get_children():
+                self.controller_tree.delete(item)
+            for item in self.aircraft_details_tree.get_children():
+                self.aircraft_details_tree.delete(item)
+
+            aircraft_cache = {}
+            current_callsign = None
+            current_index = 0
+
+            for line in lines:
+                if not line:
+                    continue
+                # Controllers
+                if line.startswith('CONTROLLER:'):
+                    # Format: CONTROLLER:CALLSIGN:FREQUENCY
+                    parts = line.split(':')
+                    if len(parts) >= 3:
+                        callsign = parts[1].strip()
+                        freq = parts[2].strip()
+                        self.controller_tree.insert('', 'end', values=(callsign, freq, '', '✓'))
+
+                # Aircraft start
+                if line.startswith('@N:'):
+                    # Example: @N:CALLSIGN:7367:1:-25.4403997:27.0490802:19000:0:1456:0
+                    parts = line.split(':')
+                    if len(parts) >= 7:
+                        callsign = parts[1].strip()
+                        lat = parts[4].strip()
+                        lon = parts[5].strip()
+                        alt = parts[6].strip()
+                        current_callsign = callsign
+                        aircraft_cache[current_callsign] = {
+                            'callsign': current_callsign,
+                            'position': f"{lat}, {lon}",
+                            'altitude': f"{alt}ft",
+                            'type': '',
+                            'route': ''
+                        }
+                        current_index += 1
+
+                # Flight plan lines ($FP...)
+                if line.startswith('$FP') or line.startswith('$FP'):
+                    # try to extract aircraft type after the colon
+                    try:
+                        parts = line.split(':')
+                        if len(parts) >= 4:
+                            callsign_fp = parts[0][3:]
+                            ac_type = parts[3].split('/')[0].strip()
+                            # if FP line belongs to last parsed callsign, set type
+                            if current_callsign and current_callsign in aircraft_cache:
+                                aircraft_cache[current_callsign]['type'] = ac_type
+                    except Exception:
+                        pass
+
+                # Route
+                if line.startswith('$ROUTE:'):
+                    route = line[len('$ROUTE:'):].strip()
+                    if current_callsign and current_callsign in aircraft_cache:
+                        aircraft_cache[current_callsign]['route'] = route
+
+            # Populate aircraft tree and map
+            for callsign, ad in aircraft_cache.items():
+                vals = (
+                    ad.get('callsign', 'N/A'),
+                    ad.get('type', 'N/A'),
+                    ad.get('altitude', 'N/A'),
+                    ad.get('position', 'N/A'),
+                    ad.get('route', ''),
+                    '250',
+                    '000'
+                )
+                self.aircraft_details_tree.insert('', 'end', values=vals)
+                # also add to map
+                if self.map_viewer and hasattr(self.map_viewer, 'add_aircraft'):
+                    self.map_viewer.add_aircraft({
+                        'callsign': ad.get('callsign'),
+                        'type': ad.get('type'),
+                        'altitude': ad.get('altitude'),
+                        'position': ad.get('position'),
+                        'route': ad.get('route'),
+                        'speed': '250',
+                        'heading': '000'
+                    })
+
+            # Redraw map
+            if self.map_viewer and hasattr(self.map_viewer, 'redraw_all'):
+                self.map_viewer.redraw_all()
+
+            messagebox.showinfo('Loaded', f'Imported sweatbox-like file: {os.path.basename(file_path)}')
+            self.status_label.config(text=f'Imported sweatbox: {os.path.basename(file_path)}')
+
+        except Exception as e:
+            messagebox.showerror('Error', f'Failed to load sweatbox file: {e}')
+
+    def create_sweatbox(self):
+        """Guided create flow: ensure SCT/ESE/RWY loaded, choose airports, optionally import existing sweatbox, then allow edits and export."""
+        # If ESE not loaded, prompt
+        if not self.ese_parser:
+            if messagebox.askyesno('Missing ESE', 'No ESE file loaded. Do you want to load one now?'):
+                self.load_ese_file()
+        # If SCT not loaded, prompt
+        if not self.sct_parser:
+            if messagebox.askyesno('Missing SCT', 'No SCT file loaded. Do you want to load one now?'):
+                self.load_sct_file()
+        # If RWY not loaded, prompt
+        if not self.rwy_parser:
+            if messagebox.askyesno('Missing RWY', 'No RWY file loaded. Do you want to load one now?'):
+                self.load_rwy_file()
+
+        # Extract available airports
+        airports = []
+        try:
+            if self.map_viewer and hasattr(self.map_viewer, 'loaded_airports') and self.map_viewer.loaded_airports:
+                airports = list(self.map_viewer.loaded_airports)
+            elif self.sct_parser and hasattr(self.sct_parser, 'get_data'):
+                data = self.sct_parser.get_data()
+                if 'airports' in data:
+                    airports = [a.get('icao') for a in data['airports'] if a.get('icao')]
+        except Exception:
+            airports = []
+
+        if not airports:
+            messagebox.showwarning('No Airports', 'No airports found in loaded data. Please load an SCT file containing airports.')
+            return
+
+        # Ask user which airports to include (multi-select)
+        sel = tk.Toplevel(self.parent)
+        sel.title('Select Airports to Include')
+        sel.geometry('300x400')
+        sel.transient(self.parent)
+        listbox = tk.Listbox(sel, selectmode=tk.MULTIPLE)
+        listbox.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        for a in airports:
+            listbox.insert(tk.END, a)
+
+        def on_select_done():
+            chosen = [listbox.get(i) for i in listbox.curselection()]
+            if not chosen:
+                messagebox.showwarning('Select', 'Please select at least one airport')
+                return
+            # Update map viewer airports and center on first
+            if self.map_viewer and hasattr(self.map_viewer, 'update_airports'):
+                self.map_viewer.update_airports(chosen)
+                # Select first
+                try:
+                    self.map_viewer.airport_combo.set(chosen[0])
+                    self.map_viewer.on_airport_selected(None)
+                except Exception:
+                    pass
+
+            sel.destroy()
+
+            # Optionally import an existing sweatbox file to pre-populate aircraft/controllers
+            if messagebox.askyesno('Import', 'Do you want to import an existing sweatbox file to edit?'):
+                self.load_sweatbox_file()
+
+            messagebox.showinfo('Create', 'You can now edit aircraft/controllers and export the sweatbox when ready.')
+
+        btn = tk.Button(sel, text='Done', command=on_select_done, bg='#2ecc71', fg='white')
+        btn.pack(pady=6)
     
     def generate_random_scenario(self):
         if not self.map_viewer:
             messagebox.showwarning("Warning", "Map viewer not available.")
             return
         
+        selected_airport = self.map_viewer.get_selected_airport()
         generator = self.RandomScenarioGenerator(self)
-        generator.generate_random_scenario()
+        generator.generate_random_scenario(selected_airport=selected_airport)
     
     def generate_aircraft_at_entry(self):
         if not self.map_viewer:
@@ -711,6 +1387,13 @@ class HomePage:
         if self.map_viewer and hasattr(self.map_viewer, 'redraw_all'):
             self.map_viewer.redraw_all()
             self.status_label.config(text="Map refreshed")
+
+    def toggle_web_map(self):
+        """Toggle between app map and web map"""
+        if self.map_viewer and hasattr(self.map_viewer, 'toggle_web_map'):
+            self.map_viewer.toggle_web_map()
+        else:
+            messagebox.showwarning("Warning", "Web map feature not available. Please install Flask and Folium.")
     
     def update_aircraft_on_map(self):
         """Update aircraft on map from tree data"""
@@ -748,8 +1431,18 @@ class HomePage:
                 if hasattr(self.map_viewer, 'add_aircraft'):
                     self.map_viewer.add_aircraft(aircraft_data)
         
-        if hasattr(self.map_viewer, 'redraw_all'):
-            self.map_viewer.redraw_all()
+        # Fit to data to show all aircraft
+        if hasattr(self.map_viewer, 'fit_to_data'):
+            try:
+                self.map_viewer.fit_to_data()
+            except:
+                pass
+
+        # Force canvas update to ensure markers are visible
+        try:
+            self.map_viewer.map_widget.canvas.update()
+        except:
+            pass
         self.status_label.config(text="Updated aircraft on map")
     
     def on_aircraft_position_update(self, callsign, new_position):
@@ -817,6 +1510,193 @@ class HomePage:
                     })
         return controllers
     
+    def show_help(self):
+        """Show comprehensive help dialog"""
+        help_window = tk.Toplevel(self.parent)
+        help_window.title("Sweatbox Creator - Help & Quick Start")
+        help_window.geometry("700x600")
+        help_window.transient(self.parent)
+        help_window.grab_set()
+
+        # Create notebook for different help sections
+        notebook = ttk.Notebook(help_window)
+        notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        # Quick Start tab
+        quick_frame = tk.Frame(notebook)
+        notebook.add(quick_frame, text="🚀 Quick Start")
+
+        quick_text = tk.Text(quick_frame, wrap=tk.WORD, padx=10, pady=10, font=('Segoe UI', 10))
+        quick_text.pack(fill=tk.BOTH, expand=True)
+
+        quick_content = """
+SWEATBOX CREATOR - QUICK START GUIDE
+
+1. LOAD YOUR DATA FILES:
+   • Click "Load SCT File" to load sector data (airports, fixes, airways)
+   • Click "Load ESE File" to load controller positions
+   • Optional: Load RWY file for detailed runway information
+
+2. CONFIGURE YOUR SCENARIO:
+   • Select an airport from the dropdown to center the map
+   • Use the checkboxes to show/hide different map elements
+   • Enable "RWY Extensions" to see 20NM centerline extensions
+
+3. ADD AIRCRAFT:
+   • Click "Add Aircraft" to manually add aircraft
+   • Or use "Generate Random Scenario" for automatic aircraft placement
+   • Edit aircraft details by selecting them and clicking "Edit Selected"
+
+4. MANAGE CONTROLLERS:
+   • Controllers are automatically loaded from ESE files
+   • Double-click controllers to toggle simulation on/off
+   • Use "Toggle Simulated" button for batch operations
+
+5. EXPORT YOUR SCENARIO:
+   • Click "Export Sweatbox" to save your scenario
+   • The file can be used with ATC simulation software
+
+TIPS:
+• Use the map controls (+/-) to zoom in/out
+• Click "Fit Data" to center all loaded elements
+• Drag aircraft on the map to reposition them
+• Double-click the map to move selected aircraft
+        """
+        quick_text.insert(tk.END, quick_content)
+        quick_text.config(state=tk.DISABLED)
+
+        # Features tab
+        features_frame = tk.Frame(notebook)
+        notebook.add(features_frame, text="✨ Features")
+
+        features_text = tk.Text(features_frame, wrap=tk.WORD, padx=10, pady=10, font=('Segoe UI', 10))
+        features_text.pack(fill=tk.BOTH, expand=True)
+
+        features_content = """
+PROFESSIONAL FEATURES
+
+MAP VISUALIZATION:
+• Interactive map with pan, zoom, and fit-to-data
+• Airport markers with ICAO codes
+• Runway centerlines and 20NM extensions
+• Aircraft positions with heading indicators
+• Navigation aids (VOR, NDB) and fixes
+• Airway boundaries and sector divisions
+
+AIRCRAFT MANAGEMENT:
+• Manual aircraft addition and editing
+• Bulk aircraft generation at entry fixes
+• Real-time position updates via map interaction
+• Route assignment and modification
+• Aircraft type and performance data
+
+CONTROLLER SIMULATION:
+• Automatic controller loading from ESE files
+• Simulation toggle for each controller position
+• Frequency and type information
+• Bulk controller management
+
+DATA SUPPORT:
+• SCT (Sector) files for airspace data
+• ESE (EuroScope) files for controller positions
+• RWY files for detailed runway information
+• Export to Sweatbox-compatible format
+
+USER INTERFACE:
+• Modern Material Design-inspired interface
+• Intuitive three-panel layout
+• Professional color scheme
+• Tooltips and contextual help
+• Responsive design with adjustable panels
+        """
+        features_text.insert(tk.END, features_content)
+        features_text.config(state=tk.DISABLED)
+
+        # Keyboard Shortcuts tab
+        shortcuts_frame = tk.Frame(notebook)
+        notebook.add(shortcuts_frame, text="⌨️ Shortcuts")
+
+        shortcuts_text = tk.Text(shortcuts_frame, wrap=tk.WORD, padx=10, pady=10, font=('Segoe UI', 10))
+        shortcuts_text.pack(fill=tk.BOTH, expand=True)
+
+        shortcuts_content = """
+KEYBOARD SHORTCUTS & MOUSE CONTROLS
+
+MAP CONTROLS:
+• Left Click + Drag: Pan the map
+• Mouse Wheel: Zoom in/out
+• Double Left Click: Move selected aircraft to position
+
+AIRCRAFT MANAGEMENT:
+• Double-click aircraft in list: Select on map
+• Right-click aircraft on map: Show context menu
+
+DATA MANAGEMENT:
+• Ctrl+S: Quick save/export
+• Ctrl+O: Load sweatbox file
+• F5: Refresh map display
+
+WINDOW MANAGEMENT:
+• Ctrl+W: Close current dialog
+• Alt+F4: Exit application
+
+MOUSE CONTROLS:
+• Hover over buttons: Show tooltips
+• Drag panel borders: Resize panels
+• Click airport markers: Center map on airport
+• Click aircraft markers: Select aircraft
+        """
+        shortcuts_text.insert(tk.END, shortcuts_content)
+        shortcuts_text.config(state=tk.DISABLED)
+
+        # About tab
+        about_frame = tk.Frame(notebook)
+        notebook.add(about_frame, text="ℹ️ About")
+
+        about_text = tk.Text(about_frame, wrap=tk.WORD, padx=10, pady=10, font=('Segoe UI', 10))
+        about_text.pack(fill=tk.BOTH, expand=True)
+
+        about_content = """
+SWEATBOX CREATOR
+Professional ATC Scenario Builder
+
+VERSION: 2.0
+PLATFORM: Cross-platform (Windows, macOS, Linux)
+
+DESCRIPTION:
+Sweatbox Creator is a professional tool for creating realistic
+Air Traffic Control training scenarios. It provides an intuitive
+interface for loading airspace data, positioning aircraft, and
+configuring controller positions for simulation training.
+
+SUPPORTED FORMATS:
+• SCT (Sector) files - Airspace and navigation data
+• ESE (EuroScope) files - Controller position data
+• RWY files - Detailed runway information
+• Sweatbox export format - Compatible with ATC simulators
+
+SYSTEM REQUIREMENTS:
+• Python 3.8 or higher
+• tkinter (included with Python)
+• tkintermapview library
+• Pillow (PIL) for enhanced graphics
+
+CONTACT & SUPPORT:
+For support, feature requests, or bug reports, please refer to
+the project documentation or contact the development team.
+
+© 2024 Sweatbox Creator Development Team
+Licensed under MIT License
+        """
+        about_text.insert(tk.END, about_content)
+        about_text.config(state=tk.DISABLED)
+
+        # Close button
+        close_btn = tk.Button(help_window, text="Close", command=help_window.destroy,
+                            bg=self.colors['primary'], fg='white',
+                            font=('Segoe UI', 10, 'bold'), padx=20, pady=8)
+        close_btn.pack(pady=10)
+
     def test_aircraft_features(self):
         """Test aircraft features with sample data"""
         # Add some test aircraft with different headings
@@ -849,13 +1729,133 @@ class HomePage:
                 'heading': '270'  # West
             }
         ]
-        
+
         for aircraft in test_aircraft:
             self.add_aircraft_from_dict(aircraft)
-        
+
         self.update_aircraft_on_map()
         messagebox.showinfo("Test", "Added 3 test aircraft with different headings")
         self.status_label.config(text="Added test aircraft with heading indicators")
+
+    def open_chat(self):
+        """Open a chat interface for user support"""
+        chat_window = tk.Toplevel(self.parent)
+        chat_window.title("Sweatbox Creator - Support Chat")
+        chat_window.geometry("500x600")
+        chat_window.transient(self.parent)
+        chat_window.grab_set()
+
+        # Chat display area
+        chat_frame = tk.Frame(chat_window, bg='white')
+        chat_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        chat_text = tk.Text(chat_frame, wrap=tk.WORD, state=tk.DISABLED,
+                          font=('Segoe UI', 10), bg='#f8f9fa')
+        chat_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+        scrollbar = tk.Scrollbar(chat_frame, command=chat_text.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        chat_text.config(yscrollcommand=scrollbar.set)
+
+        # Input area
+        input_frame = tk.Frame(chat_window, bg='white')
+        input_frame.pack(fill=tk.X, padx=10, pady=5)
+
+        input_entry = tk.Entry(input_frame, font=('Segoe UI', 10))
+        input_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
+
+        def send_message():
+            message = input_entry.get().strip()
+            if message:
+                chat_text.config(state=tk.NORMAL)
+                chat_text.insert(tk.END, f"You: {message}\n")
+                chat_text.config(state=tk.DISABLED)
+                chat_text.see(tk.END)
+                input_entry.delete(0, tk.END)
+
+                # Simulate bot response
+                import time
+                chat_window.after(1000, lambda: show_bot_response(message))
+
+        def show_bot_response(user_message):
+            responses = {
+                "help": "I'm here to help! You can ask me about:\n• Loading SCT/ESE files\n• Aircraft generation\n• Controller setup\n• Exporting scenarios",
+                "sct": "SCT files contain sector data including airports, runways, fixes, and airways. Load them first to see the airspace structure.",
+                "ese": "ESE files contain controller positions and frequencies. They're needed for realistic ATC simulation.",
+                "aircraft": "You can add aircraft manually or generate them randomly. Each aircraft needs a callsign, type, position, and route.",
+                "export": "Once you have aircraft and controllers set up, use 'Export Sweatbox' to save your scenario for ATC simulation.",
+            }
+
+            response = "I'm a simple chat bot. Please check the Help & Tips section for detailed guidance, or visit our documentation for more information."
+
+            for keyword, resp in responses.items():
+                if keyword.lower() in user_message.lower():
+                    response = resp
+                    break
+
+            chat_text.config(state=tk.NORMAL)
+            chat_text.insert(tk.END, f"Support Bot: {response}\n\n")
+            chat_text.config(state=tk.DISABLED)
+            chat_text.see(tk.END)
+
+        send_btn = tk.Button(input_frame, text="Send", command=send_message,
+                           bg=self.colors['primary'], fg='white',
+                           font=('Segoe UI', 9, 'bold'), padx=15)
+        send_btn.pack(side=tk.RIGHT)
+
+        # Bind Enter key to send
+        input_entry.bind('<Return>', lambda e: send_message())
+
+        # Initial welcome message
+        chat_text.config(state=tk.NORMAL)
+        chat_text.insert(tk.END, "Support Bot: Welcome to Sweatbox Creator support!\n\n")
+        chat_text.insert(tk.END, "How can I help you today? You can ask about:\n")
+        chat_text.insert(tk.END, "• Loading data files (SCT, ESE, RWY)\n")
+        chat_text.insert(tk.END, "• Aircraft management\n")
+        chat_text.insert(tk.END, "• Controller setup\n")
+        chat_text.insert(tk.END, "• Exporting scenarios\n\n")
+        chat_text.config(state=tk.DISABLED)
+
+    def prompt_startup_controller_type(self):
+        """Prompt user for controller type selection on startup"""
+        import tkinter as tk
+        from tkinter import simpledialog
+
+        root = tk.Tk()
+        root.withdraw()  # Hide the root window
+        root.attributes('-topmost', True)  # Bring to front
+
+        try:
+            result = simpledialog.askstring(
+                "Controller Type Selection",
+                "Welcome to Sweatbox Creator!\n\nSelect your controller type:\n\nGND/DEL = Ground/Delivery\nTWR = Tower\nAPP/DEP = Approach/Departure\nCTR = Center\n\nEnter: GND/DEL, TWR, APP/DEP, or CTR",
+                parent=root
+            )
+        finally:
+            root.destroy()
+
+        if result:
+            result = result.upper().strip()
+            if result in ['GND/DEL', 'TWR', 'APP/DEP', 'CTR']:
+                messagebox.showinfo("Controller Type Selected",
+                    f"You selected: {result}\n\n"
+                    f"{'Note: ESE file will be loaded automatically for Approach/Departure controllers.' if result == 'APP/DEP' else ''}")
+
+                # If APP/DEP selected, automatically load ESE file
+                if result == 'APP/DEP':
+                    self.load_ese_file()
+
+                return result
+            else:
+                messagebox.showerror("Invalid Selection",
+                    "Please enter GND/DEL, TWR, APP/DEP, or CTR")
+                # Recursively prompt again
+                return self.prompt_startup_controller_type()
+        else:
+            # User cancelled, default to GND/DEL
+            messagebox.showinfo("Default Selection",
+                "No selection made. Defaulting to Ground/Delivery (GND/DEL) controller.")
+            return 'GND/DEL'
 
 # For backward compatibility
 SweatboxCreatorPage = HomePage

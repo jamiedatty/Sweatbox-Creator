@@ -174,7 +174,15 @@ class SCTParser:
         # Build final parsed data
         self.parsed_data = {
             'metadata': self.metadata,
-            'runways': [r.__dict__ for r in self.runways],
+            'runways': [{
+                'number': r.number,
+                'heading': r.heading,
+                'length': r.length,
+                'width': r.width,
+                'surface': r.surface,
+                'ils': r.ils,
+                'coordinates': [(c.lat, c.lon) for c in r.coordinates]  # Convert to tuples
+            } for r in self.runways],
             'frequencies': [f.__dict__ for f in self.frequencies],
             'VOR': [{'latitude': v.coord.lat, 'longitude': v.coord.lon, 'name': v.name, 'id': v.id} for v in self.vors],
             'NDB': [{'latitude': n.coord.lat, 'longitude': n.coord.lon, 'name': n.name, 'id': n.id} for n in self.ndbs],
@@ -255,68 +263,122 @@ class SCTParser:
                 self.artcc_low_boundaries = artcc_data
     
     def _parse_artcc_section_optimized(self, lines: List[str]) -> List[Dict]:
-        """Optimized ARTCC boundary parsing with line combination"""
+        """Parse ARTCC boundaries - handles coordinates on same line as name"""
         boundaries = []
         current_boundary = None
-        current_path = []  # Track current continuous path
+        current_path = []
         
-        for line in lines:
+        print(f"\n=== PARSING ARTCC: {len(lines)} lines ===")
+        
+        for idx, line in enumerate(lines):
             line = line.strip()
             if not line:
                 continue
             
-            # Check if it's a boundary name (not starting with coordinate pattern)
-            if not line.startswith(('N', 'S', ' ')) and not line[0].isdigit():
-                # End previous boundary
-                if current_boundary:
-                    # Add any remaining path segments
+            # Check if line contains coordinates (S/N followed by numbers)
+            has_coords = bool(re.search(r'[SN]\d{3}\.\d{2}\.\d{2}\.\d{3}', line))
+            
+            if idx < 5:
+                print(f"Line {idx}: '{line[:80]}'")
+                print(f"  Has coords: {has_coords}")
+            
+            if has_coords:
+                # This line has coordinates - extract name and coords
+                # Format: NAME    S037.00.00.000 E022.00.00.000 S037.00.00.000 E015.00.00.000
+                
+                # Split on coordinate pattern
+                parts = re.split(r'([SN]\d{3}\.\d{2}\.\d{2}\.\d{3}\s+[EW]\d{3}\.\d{2}\.\d{2}\.\d{3})', line)
+                
+                # First part is the name (before coordinates)
+                name = parts[0].strip() if parts else "UNNAMED"
+                
+                # Filter out _FSS and _CTR boundaries
+                if '_FSS' in name.upper() or '_CTR' in name.upper():
+                    if idx < 5:
+                        print(f"  Skipping FSS/CTR boundary: {name[:40]}")
+                    continue
+                
+                # End previous boundary if exists
+                if current_boundary and current_boundary['name'] != name:
                     self._add_path_to_boundary(current_boundary, current_path)
                     boundaries.append(current_boundary)
+                    print(f"✓ Boundary '{current_boundary['name'][:30]}': {len(current_boundary['segments'])} segs")
+                    current_boundary = None
+                    current_path = []
                 
-                # Start new boundary
-                current_boundary = {
-                    'name': line,
-                    'segments': []
-                }
-                current_path = []  # Reset current path
-                continue
-            
-            # Parse coordinate line for current boundary
-            if current_boundary is not None:
-                # Split line into coordinate parts
-                parts = line.split()
+                # Start new boundary if needed
+                if not current_boundary:
+                    current_boundary = {'name': name, 'segments': []}
+                    print(f"✓ New boundary: '{name[:40]}'")
                 
-                # Process each pair of coordinates in the line
-                for i in range(0, len(parts), 4):
-                    if i + 3 >= len(parts):
+                # Extract all coordinate pairs from this line
+                coord_pattern = r'([SN])(\d{3})\.(\d{2})\.(\d{2})\.(\d{3})\s+([EW])(\d{3})\.(\d{2})\.(\d{2})\.(\d{3})'
+                coord_matches = list(re.finditer(coord_pattern, line))
+                
+                if idx < 5:
+                    print(f"  Found {len(coord_matches)} coordinate pairs")
+                
+                # Parse coordinates in pairs (start, end)
+                for i in range(0, len(coord_matches), 2):
+                    if i + 1 >= len(coord_matches):
                         break
                     
-                    # Parse start and end coordinates
-                    start_str = f"{parts[i]} {parts[i+1]}"
-                    end_str = f"{parts[i+2]} {parts[i+3]}"
+                    # Parse start coordinate
+                    m1 = coord_matches[i]
+                    lat_dir, lat_d, lat_m, lat_s, lat_ms = m1.groups()[:5]
+                    lon_dir, lon_d, lon_m, lon_s, lon_ms = m1.groups()[5:]
                     
-                    start_coord = self._parse_coordinate_fast(start_str)
-                    end_coord = self._parse_coordinate_fast(end_str)
+                    lat1 = float(lat_d) + float(lat_m)/60 + (float(lat_s) + float(lat_ms)/1000)/3600
+                    if lat_dir == 'S':
+                        lat1 = -lat1
+                    lon1 = float(lon_d) + float(lon_m)/60 + (float(lon_s) + float(lon_ms)/1000)/3600
+                    if lon_dir == 'W':
+                        lon1 = -lon1
                     
-                    if not start_coord or not end_coord:
-                        continue
+                    # Parse end coordinate
+                    m2 = coord_matches[i + 1]
+                    lat_dir, lat_d, lat_m, lat_s, lat_ms = m2.groups()[:5]
+                    lon_dir, lon_d, lon_m, lon_s, lon_ms = m2.groups()[5:]
                     
-                    # Check if we can continue the current path
+                    lat2 = float(lat_d) + float(lat_m)/60 + (float(lat_s) + float(lat_ms)/1000)/3600
+                    if lat_dir == 'S':
+                        lat2 = -lat2
+                    lon2 = float(lon_d) + float(lon_m)/60 + (float(lon_s) + float(lon_ms)/1000)/3600
+                    if lon_dir == 'W':
+                        lon2 = -lon2
+                    
+                    start_coord = (lat1, lon1)
+                    end_coord = (lat2, lon2)
+                    
+                    if idx < 5 and i == 0:
+                        print(f"  Coord pair: {start_coord} → {end_coord}")
+                    
+                    # Add to path
                     if not current_path:
-                        # Start new path
                         current_path = [start_coord, end_coord]
                     elif self._coords_equal(current_path[-1], start_coord):
-                        # Continue existing path
                         current_path.append(end_coord)
                     else:
-                        # End current path and start new one
                         self._add_path_to_boundary(current_boundary, current_path)
                         current_path = [start_coord, end_coord]
+            else:
+                # Line without coordinates - might be continuation or new boundary
+                if current_boundary:
+                    # Save current boundary
+                    self._add_path_to_boundary(current_boundary, current_path)
+                    boundaries.append(current_boundary)
+                    print(f"✓ Boundary '{current_boundary['name'][:30]}': {len(current_boundary['segments'])} segs")
+                    current_boundary = None
+                    current_path = []
         
-        # Handle last boundary and path
+        # Handle last boundary
         if current_boundary:
             self._add_path_to_boundary(current_boundary, current_path)
             boundaries.append(current_boundary)
+            print(f"✓ Last boundary '{current_boundary['name'][:30]}': {len(current_boundary['segments'])} segs")
+        
+        total = sum(len(b['segments']) for b in boundaries)
+        print(f"=== RESULT: {len(boundaries)} boundaries, {total} segments ===\n")
         
         return boundaries
     
@@ -396,14 +458,133 @@ class SCTParser:
                     except ValueError:
                         continue
     
-    def _parse_runways(self):
-        """Parse runway data"""
-        if 'RUNWAY' not in self.raw_data:
-            return
+    def _parse_dms_coordinate(self, dms_str: str) -> Optional[float]:
+        """Parse DMS (Degrees Minutes Seconds) format coordinate.
+        
+        Examples:
+        - N025.17.27.520 -> latitude 25.290866...
+        - E051.35.23.071 -> longitude 51.589741...
+        """
+        if not dms_str or len(dms_str) < 4:
+            return None
+        
+        try:
+            # First character is N/S/E/W
+            direction = dms_str[0].upper()
+            dms_value = dms_str[1:]  # Remove direction prefix
             
-        for line in self.raw_data['RUNWAY']:
+            # Split by dots
+            parts = dms_value.split('.')
+            if len(parts) < 3:
+                return None
+            
+            degrees = int(parts[0])
+            minutes = int(parts[1])
+            seconds = float(parts[2]) if len(parts) > 2 else 0
+            
+            # Convert to decimal degrees
+            decimal = degrees + (minutes / 60.0) + (seconds / 3600.0)
+            
+            # Apply direction (S and W are negative)
+            if direction in ['S', 'W']:
+                decimal = -decimal
+            
+            return decimal
+        except (ValueError, IndexError):
+            return None
+    
+    def _parse_dms_coordinate_pair(self, lat_str: str, lon_str: str) -> Optional[tuple]:
+        """Parse a pair of DMS coordinates and return (lat, lon) or None."""
+        lat = self._parse_dms_coordinate(lat_str)
+        lon = self._parse_dms_coordinate(lon_str)
+        
+        if lat is not None and lon is not None:
+            return (lat, lon)
+        return None
+    
+    def _parse_decimal_coordinate(self, coord_str: str) -> Optional[float]:
+        """Parse decimal coordinate (simple float)."""
+        try:
+            val = float(coord_str)
+            if -180 <= val <= 180:  # Basic range check
+                return val
+        except ValueError:
+            pass
+        return None
+    
+    def _parse_runways(self):
+        """Parse runway data - handles both decimal and DMS formats"""
+        if 'RUNWAY' not in self.raw_data:
+            print("DEBUG: No RUNWAY section found in SCT file")
+            return
+        
+        print(f"\nDEBUG: Parsing {len(self.raw_data['RUNWAY'])} runway lines")
+        
+        for idx, line in enumerate(self.raw_data['RUNWAY']):
+            if idx < 3:
+                print(f"  Runway line {idx}: '{line[:80]}'")
+            
             parts = line.split()
-            if len(parts) >= 6:
+            if idx < 3:
+                print(f"    Parts: {len(parts)} -> {parts[:6]}")
+            
+            # Try to handle DMS format first (has N/E/S/W coordinates)
+            # Format: RWY_NUM1 RWY_NUM2 HDG1 HDG2 LAT LON LAT LON AIRPORT ...
+            dms_coords = [p for p in parts if p and (p[0] in 'NSEW')]
+            
+            if len(dms_coords) >= 2:  # Can parse DMS format
+                try:
+                    # DMS format: runway_num1 runway_num2 heading1 heading2 lat lon lat lon airport_id
+                    rwy_num1 = parts[0] if parts else "???"
+                    rwy_num2 = parts[1] if len(parts) > 1 else None
+                    heading1 = float(parts[2]) if len(parts) > 2 else 0
+                    heading2 = float(parts[3]) if len(parts) > 3 else 0
+                    
+                    coords = []
+                    # Coordinates should be right after the headings
+                    for i in range(4, len(parts) - 1, 2):
+                        if i < len(parts) - 1:
+                            lat_str = parts[i]
+                            lon_str = parts[i + 1]
+                            
+                            # Check if this looks like DMS coordinates
+                            if lat_str and lat_str[0] in 'NS' and lon_str and lon_str[0] in 'EW':
+                                coord_pair = self._parse_dms_coordinate_pair(lat_str, lon_str)
+                                if coord_pair:
+                                    coords.append(Coordinate(coord_pair[0], coord_pair[1]))
+                    
+                    if idx < 3:
+                        print(f"    [OK] Parsed runway {rwy_num1}: {len(coords)} DMS coordinates")
+                    
+                    if len(coords) >= 2:
+                        self.runways.append(Runway(
+                            number=rwy_num1,
+                            heading=heading1,
+                            length=0,  # Not available in DMS format
+                            width=0,   # Not available in DMS format
+                            surface="ASPH",  # Default assumption
+                            ils=None,
+                            coordinates=coords
+                        ))
+                        
+                        # Also add the reciprocal runway if it exists (16R/34L)
+                        if rwy_num2:
+                            self.runways.append(Runway(
+                                number=rwy_num2,
+                                heading=heading2,
+                                length=0,
+                                width=0,
+                                surface="ASPH",
+                                ils=None,
+                                coordinates=list(reversed(coords))  # Reversed coordinates for opposite direction
+                            ))
+                except Exception as e:
+                    if idx < 3:
+                        print(f"    [ERROR] DMS parse failed: {e}")
+                    continue
+            
+            # Fall back to standard decimal format
+            elif len(parts) >= 6:
                 try:
                     rwy_num = parts[0]
                     heading = float(parts[1])
@@ -412,13 +593,16 @@ class SCTParser:
                     surface = parts[4] if len(parts) > 4 else "ASPH"
                     
                     coords = []
-                    for i in range(5, len(parts)-1, 2):
+                    for i in range(5, len(parts) - 1, 2):
                         try:
                             lat = float(parts[i])
-                            lon = float(parts[i+1])
+                            lon = float(parts[i + 1])
                             coords.append(Coordinate(lat, lon))
                         except ValueError:
                             continue
+                    
+                    if idx < 3:
+                        print(f"    [OK] Parsed runway {rwy_num}: {len(coords)} decimal coordinates")
                     
                     ils = None
                     ils_match = self._ILS_PATTERN.search(line)
@@ -434,8 +618,12 @@ class SCTParser:
                         ils=ils,
                         coordinates=coords
                     ))
-                except (ValueError, IndexError):
+                except (ValueError, IndexError) as e:
+                    if idx < 3:
+                        print(f"    [ERROR] Decimal parse failed: {e}")
                     continue
+        
+        print(f"DEBUG: Parsed {len(self.runways)} runways total\n")
     
     def _parse_frequencies(self):
         """Parse frequency data"""

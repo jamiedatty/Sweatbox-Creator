@@ -26,6 +26,20 @@ class SweatboxExporter:
         lines.append(f"; Master Controller: {self.creator.master_controller}")
         lines.append("")
         
+        # Selected Airports and Runways section
+        if hasattr(self.creator, 'map_viewer') and self.creator.map_viewer:
+            map_viewer = self.creator.map_viewer
+            selected_airports = getattr(map_viewer, 'selected_airports', {})
+            selected_runways = getattr(map_viewer, 'selected_runways', {})
+            
+            if selected_airports or selected_runways:
+                lines.append("; Selected Airports and Runways")
+                for airport_icao in sorted(selected_airports.keys()):
+                    lines.append(f"; AIRPORT: {airport_icao}")
+                for runway_id in sorted(selected_runways.keys()):
+                    lines.append(f"; RUNWAY: {runway_id}")
+                lines.append("")
+        
         # Master controller
         lines.append(f"PSEUDOPILOT:{self.creator.master_controller}")
         lines.append("")
